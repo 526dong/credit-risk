@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.assetlayer.LayerLevelMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.assetlayer.LayerLeve" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="layer_name" property="layerName" jdbcType="VARCHAR" />
+    <result column="security_type" property="securityType" jdbcType="TINYINT" />
+    <result column="capital_rate" property="capitalRate" jdbcType="DECIMAL" />
+    <result column="expect_earnings_rate" property="expectEarningsRate" jdbcType="DECIMAL" />
+    <result column="is_float" property="isFloat" jdbcType="TINYINT" />
+    <result column="layer_order" property="layerOrder" jdbcType="INTEGER" />
+    <result column="float_value" property="floatValue" jdbcType="DECIMAL" />
+    <result column="is_del" property="isDel" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, layer_name, security_type, capital_rate, expect_earnings_rate, is_float, 
+    layer_order, float_value, is_del
+  </sql>
+  
+  <!-- 查询分层层级列表(分页) -->
+	<select id="findLevelList" resultMap="BaseResultMap">
+		SELECT
+		  <include refid="Base_Column_List" />
+		FROM
+			abs_layer_level
+		WHERE
+			is_del = 0
+	</select>
+</mapper>

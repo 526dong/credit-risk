@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.assetsPackage.AssetsPackageMapper">
+    <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.assetsPackage.AssetsPakege">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="asset_package_no" property="assetPackageNo" jdbcType="VARCHAR"/>
+        <result column="asset_type" property="assetType" jdbcType="TINYINT"/>
+        <result column="asset_package_name" property="assetPackageName" jdbcType="VARCHAR"/>
+        <result column="creator_name" property="creatorName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="institution_id" property="institutionId" jdbcType="INTEGER"/>
+        <result column="is_del" property="isDel" jdbcType="TINYINT"/>
+        <result column="assetsNum" property="assetsNum" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, asset_package_no, asset_package_name, creator_name, create_time, institution_id, is_del
+  </sql>
+
+    <!--资产-->
+    <resultMap id="AssetsResultMap" type="com.ccx.credit.risk.model.asset.AbsAsset">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="apply_code" property="applyCode" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="business_type" property="businessType" jdbcType="INTEGER"/>
+        <result column="business_name" property="businessName" jdbcType="VARCHAR"/>
+        <result column="tenant_ent" property="tenantEnt" jdbcType="VARCHAR"/>
+        <result column="seller_ent" property="sellerEnt" jdbcType="VARCHAR"/>
+        <result column="buyer_ent" property="buyerEnt" jdbcType="VARCHAR"/>
+        <result column="borrow_ent" property="borrowEnt" jdbcType="VARCHAR"/>
+        <result column="state" property="state" jdbcType="INTEGER"/>
+        <result column="asset_end_reason" property="assetEndReason" jdbcType="VARCHAR"/>
+        <result column="bond_principal" property="bondPrincipal" jdbcType="DECIMAL"/>
+        <result column="time_limit" property="timeLimit" jdbcType="INTEGER"/>
+        <result column="interest_rate_type" property="interestRateType" jdbcType="INTEGER"/>
+        <result column="annual_interest_rate" property="annualInterestRate" jdbcType="DECIMAL"/>
+        <result column="irr" property="irr" jdbcType="DECIMAL"/>
+        <result column="fee_collect_type_and_rate" property="feeCollectTypeAndRate" jdbcType="VARCHAR"/>
+        <result column="put_date" property="putDate" jdbcType="TIMESTAMP"/>
+        <result column="ent_id" property="entId" jdbcType="INTEGER"/>
+        <result column="ent_name" property="entName" jdbcType="VARCHAR"/>
+        <result column="level" property="level" jdbcType="VARCHAR"/>
+        <result column="ent_shadow_id" property="entShadowId" jdbcType="INTEGER"/>
+        <result column="ent_shadow_name" property="entShadowName" jdbcType="VARCHAR"/>
+        <result column="shadow_level" property="shadowLevel" jdbcType="VARCHAR"/>
+        <result column="province" property="province" jdbcType="VARCHAR"/>
+        <result column="industry1" property="industry1" jdbcType="VARCHAR"/>
+        <result column="industry2" property="industry2" jdbcType="VARCHAR"/>
+        <result column="creator_name" property="operator" jdbcType="VARCHAR"/>
+        <result column="create_date" property="operateDate" jdbcType="TIMESTAMP"/>
+        <result column="company_id" property="companyId" jdbcType="TIMESTAMP"/>
+
+        <!--业务类型名称-->
+        <association property="businessTypeName" select="findBusinessNameById" column="{id=business_type,type=type}"></association>
+    </resultMap>
+
+    <sql id="Asset_Column_List">
+		id, name, code, apply_code, type, business_type, business_name, tenant_ent, seller_ent, buyer_ent, borrow_ent,
+		state, asset_end_reason, bond_principal, time_limit, interest_rate_type, annual_interest_rate, irr, fee_collect_type_and_rate,
+		put_date, ent_id, ent_name, level, ent_shadow_id, ent_shadow_name, shadow_level, creator_name, create_date, company_id
+	</sql>
+
+    <!--通过id查询name-->
+    <select id="findBusinessNameById" resultType="java.lang.String" parameterType="java.util.Map">
+        SELECT
+        name
+        FROM
+        abs_asset_business_type
+        WHERE id = #{id,jdbcType=INTEGER}
+        AND type = #{type,jdbcType=INTEGER}
+    </select>
+
+    <!-- 映射主体实体sql -->
+    <select id="findEnterpriseNames" parameterType="java.lang.Integer" resultType="java.util.Map">
+    select
+    	name enterpriseName
+    from abs_enterprise
+    where id = #{enterprise_id,jdbcType=INTEGER}
+  </select>
+
+    <!-- 查询资产包list（分页） -->
+    <select id="findAllAssetsPackageList" resultType="com.ccx.credit.risk.model.assetsPackage.AssetsPakege">
+        SELECT
+        aap.id,
+        aap.asset_package_no assetPackageNo,
+        aap.asset_package_name assetPackageName,
+        aap.creator_name creatorName,
+        aap.create_time createTime,
+        aap.institution_id institutionId,
+        aap.is_del isDel,
+        aap.asset_type assetType,
+        COUNT(aapm.id) assetsNum
+        FROM
+        abs_assets_pakege aap
+        LEFT JOIN abs_assets_pakege_msg aapm ON aap.id = aapm.assets_package_id
+        <where>
+            aap.is_del = 0
+            <if test="null!= insId and ''!= insId ">
+                and aap.institution_id = #{insId}
+            </if>
+            <if test="null!= assetType and ''!= assetType and '0000'!= assetType ">
+                and aap.asset_type = #{assetType}
+            </if>
+            <if test="null!= startTime and ''!= startTime ">
+                <![CDATA[and aap.create_time >=#{startTime} ]]>
+            </if>
+            <if test="null!= endTime and ''!= endTime ">
+                <![CDATA[and aap.create_time <=#{startTime} ]]>
+            </if>
+            <if test="null!= keyWord and ''!= keyWord">
+                and (
+                aap.asset_package_name like concat('%',#{keyWord},'%')
+                or
+                aap.asset_package_no like concat('%',#{keyWord},'%')
+                or
+                aap.creator_name like concat('%',#{keyWord},'%')
+                )
+            </if>
+        </where>
+        GROUP BY
+        aap.id
+        ORDER BY
+        aap.create_time DESC
+    </select>
+    <!-- 删除资产包 -->
+    <update id="deleteAssetsPackage" parameterType="java.lang.Integer">
+    update abs_assets_pakege
+	set
+	is_del = 1
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <!-- 验证资产包名称是否唯一 -->
+    <select id="checkAssetPackageName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from abs_assets_pakege
+        where 1=1
+        <if test="null != assetPackageName and ''!= assetPackageName">
+            AND asset_package_name = #{assetPackageName,jdbcType=VARCHAR}
+        </if>
+    </select>
+    <!-- 验证资产包编号是否唯一 -->
+    <select id="checkAssetPackageNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from abs_assets_pakege
+        where 1=1
+        <if test="null != assetPackageNo and ''!= assetPackageNo">
+            AND asset_package_no = #{assetPackageNo,jdbcType=VARCHAR}
+        </if>
+    </select>
+    <!-- 保存新增的资产包 -->
+    <insert id="saveAddAssetPackage" parameterType="com.ccx.credit.risk.model.assetsPackage.AssetsPakege">
+        insert into abs_assets_pakege
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="assetPackageNo != null">
+                asset_package_no,
+            </if>
+            <if test="assetPackageName != null">
+                asset_package_name,
+            </if>
+            <if test="creatorName != null">
+                creator_name,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="institutionId != null">
+                institution_id,
+            </if>
+            <if test="isDel != null">
+                is_del,
+            </if>
+            <if test="assetType != null">
+                asset_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="assetPackageNo != null">
+                #{assetPackageNo,jdbcType=VARCHAR},
+            </if>
+            <if test="assetPackageName != null">
+                #{assetPackageName,jdbcType=VARCHAR},
+            </if>
+            <if test="creatorName != null">
+                #{creatorName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="institutionId != null">
+                #{institutionId,jdbcType=INTEGER},
+            </if>
+            <if test="isDel != null">
+                #{isDel,jdbcType=TINYINT},
+            </if>
+            <if test="assetType != null">
+                #{assetType,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <!-- 根据资产包id查询资产包信息   -->
+    <select id="findAssetsPackage" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    SELECT
+		aap.id,
+		aap.asset_package_no,
+		aap.asset_package_name,
+		aap.creator_name,
+		aap.create_time,
+		aap.institution_id,
+		aap.is_del,
+		aap.asset_type,
+		COUNT(aapm.id) assetsNum
+	FROM
+		abs_assets_pakege aap
+	LEFT JOIN abs_assets_pakege_msg aapm ON aap.id = aapm.assets_package_id
+	WHERE
+		aap.is_del = 0
+	AND aap.id = #{assetsPackageId,jdbcType=INTEGER}
+	GROUP BY
+		aap.id
+  </select>
+    <!-- 根据资产包id查询当前资产包下所有的资产list(分页) -->
+    <select id="findAssetsListByPackageId" resultMap="AssetsResultMap" parameterType="map">
+        SELECT
+        asa.*
+        FROM
+        abs_assets_pakege_msg aapm
+        LEFT JOIN abs_asset asa ON aapm.assets_id = asa.id
+        WHERE 1=1
+        <if test="null!= assetsPackageId and ''!= assetsPackageId ">
+            and aapm.assets_package_id = #{assetsPackageId,jdbcType=INTEGER}
+        </if>
+        <if test="null != keyWord and '' != keyWord">
+            and (asa.name like concat('%',#{keyWord},'%')
+            or asa.creator_name like concat('%',#{keyWord},'%'))
+        </if>
+        ORDER BY
+        asa.create_date DESC
+    </select>
+    <!-- 删除资产包下的资产 -->
+    <delete id="deleteAssetsOfPackage" parameterType="java.lang.Integer">
+    DELETE
+	FROM
+		abs_assets_pakege_msg
+	WHERE
+		1 = 1
+	AND assets_id = #{assetsId,jdbcType=INTEGER}
+	AND assets_package_id = #{assetsPackageId,jdbcType=INTEGER}
+  </delete>
+    <!-- 查询可以选择的资产list（分页）   -->
+    <select id="findAllAssetsList" resultMap="AssetsResultMap" parameterType="map">
+        SELECT
+        <include refid="Asset_Column_List"/>
+        FROM
+        abs_asset
+        WHERE
+        1 = 1
+        <if test="null!= assetType and ''!= assetType and '0000'!= assetType ">
+            and type = #{assetType}
+        </if>
+        <if test="null!= insId and ''!= insId ">
+            AND company_id = #{insId,jdbcType=INTEGER}
+        </if>
+        <if test="null != keyWord and '' != keyWord">
+            and (name like concat('%',#{keyWord},'%')
+            or creator_name like concat('%',#{keyWord},'%'))
+        </if>
+        AND id NOT IN (
+        SELECT
+        aapm.assets_id
+        FROM
+        abs_assets_pakege_msg aapm
+        WHERE
+        1 = 1
+        <if test="null!= assetsPackageId and ''!= assetsPackageId ">
+            AND aapm.assets_package_id = #{assetsPackageId,jdbcType=INTEGER}
+        </if>
+        )
+        ORDER BY
+        create_date DESC
+    </select>
+    <!-- 根据资产包id查询当前资产包下所有的资产list -->
+    <select id="findAssetsListById" resultMap="AssetsResultMap" parameterType="java.lang.Integer">
+        SELECT
+        asa.*
+        FROM
+        abs_assets_pakege_msg aapm
+        LEFT JOIN abs_asset asa ON aapm.assets_id = asa.id
+        WHERE 1=1
+        <if test="null!= assetsPackageId and ''!= assetsPackageId ">
+            and aapm.assets_package_id = #{assetsPackageId,jdbcType=INTEGER}
+        </if>
+        ORDER BY
+        asa.create_date DESC
+    </select>
+    <!-- 查询当前资产包下所有的还款计划信息 -->
+    <select id="findRepaymentList" resultType="java.util.LinkedHashMap" parameterType="java.lang.Integer">
+        SELECT
+        a.id,
+        a.assets_id assetsId,
+        a.repayment_date repaymentDate,
+        a.repayment_amount repaymentAmount,
+        a.repayment_Interest repaymentInterest
+        FROM
+        abs_assets_repayment a
+        LEFT JOIN abs_assets_pakege_msg b ON a.assets_id = b.assets_id
+        WHERE 1=1
+        <if test="null!= assetsPackageId and ''!= assetsPackageId ">
+            AND b.assets_package_id = #{assetsPackageId,jdbcType=INTEGER}
+        </if>
+        ORDER BY
+        a.assets_id,
+        a.repayment_date
+    </select>
+    <!-- 按月统计当前资产包下所有的还款计划信息 -->
+    <select id="countRepaymentList" resultType="java.util.LinkedHashMap" parameterType="java.lang.Integer">
+        SELECT
+        sum(a.repayment_amount+a.repayment_Interest) AS repaymentAmountInterestSum,
+        sum(a.repayment_amount) AS repaymentAmount,
+        sum(a.repayment_Interest) AS repaymentInterest,
+        date_format(a.repayment_date, '%Y-%m') repaymentDate
+        FROM
+        abs_assets_repayment a
+        LEFT JOIN abs_assets_pakege_msg b ON a.assets_id = b.assets_id
+        WHERE
+        1 = 1
+        <if test="null!= assetsPackageId and ''!= assetsPackageId ">
+            AND b.assets_package_id = #{assetsPackageId,jdbcType=INTEGER}
+        </if>
+        GROUP BY
+        date_format(a.repayment_date, '%Y-%m')
+        ORDER BY
+        date_format(a.repayment_date, '%Y-%m') ASC
+    </select>
+    <!-- 统计当前资产包下所有行业分布 -->
+    <select id="countAssetsInsdustryList" resultType="java.util.LinkedHashMap" parameterType="java.lang.Integer">
+        SELECT
+        aib.name AS name,
+        COUNT(aib.name) AS value
+        FROM
+        abs_assets_pakege_msg aapm
+        LEFT JOIN abs_asset asa ON aapm.assets_id = asa.id
+        LEFT JOIN abs_enterprise ae ON asa.ent_id = ae.id
+        LEFT JOIN abs_industry_back aib ON aib.id = ae.industry1
+        WHERE
+        1 = 1
+        AND aib. NAME IS NOT NULL
+        AND aib. NAME != ''
+        <if test="null!= assetsPackageId and ''!= assetsPackageId ">
+            AND aapm.assets_package_id = #{assetsPackageId,jdbcType=INTEGER}
+        </if>
+        GROUP BY
+        aib.name
+    </select>
+    <!-- 统计当前资产包下所有区域分布 -->
+    <select id="countAssetsAreaList" resultType="java.util.LinkedHashMap" parameterType="java.lang.Integer">
+        SELECT
+        ae.province_id AS name,
+        COUNT(ae.province_id) AS value
+        FROM
+        abs_assets_pakege_msg aapm
+        LEFT JOIN abs_asset asa ON aapm.assets_id = asa.id
+        LEFT JOIN abs_enterprise ae ON asa.ent_id = ae.id
+        WHERE
+        1 = 1
+        AND ae.province_id IS NOT NULL
+        AND ae.province_id != ''
+        <if test="null!= assetsPackageId and ''!= assetsPackageId ">
+            AND aapm.assets_package_id = #{assetsPackageId,jdbcType=INTEGER}
+        </if>
+        GROUP BY
+        ae.province_id
+    </select>
+
+    <select id="getAssetListById" resultMap="AssetsResultMap" parameterType="java.lang.Integer">
+      SELECT a.* FROM abs_assets_pakege_msg msg, abs_asset a WHERE msg.assets_package_id = #{0} AND msg.assets_id = a.id
+    </select>
+
+    <!--通过资产包id更新资产报名称-->
+    <insert id="updateAssetPackageNameById" parameterType="java.util.Map">
+		UPDATE abs_assets_pakege
+		SET asset_package_name = #{name,jdbcType=VARCHAR}
+		WHERE id = #{id,jdbcType=INTEGER}
+	</insert>
+
+    <!--批量添加资产和资产包关联信息-->
+    <insert id="batchInsertAsset" parameterType="java.util.List">
+        insert into abs_assets_pakege_msg (assets_package_id, assets_id) values
+        <foreach collection="list" item="bean" index="index" separator=",">
+            (#{bean.assetPackageId,jdbcType=INTEGER}, #{bean.assetId,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+    <!--通过资产包id删除资产包和资产关联-->
+    <delete id="deleteByAssetPackageId" parameterType="java.lang.Integer">
+		delete from abs_assets_pakege_msg
+		where assets_package_id = #{id,jdbcType=INTEGER}
+	</delete>
+</mapper>

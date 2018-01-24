@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.AbsOperationRecordMapper">
+    <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.AbsOperationRecord">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="operator" property="operator" jdbcType="VARCHAR"/>
+        <result column="operation_time" property="operationTime" jdbcType="TIMESTAMP"/>
+        <result column="basic_module" property="basicModule" jdbcType="VARCHAR"/>
+        <result column="concrete_module" property="concreteModule" jdbcType="VARCHAR"/>
+        <result column="operation_method" property="operationMethod" jdbcType="VARCHAR"/>
+        <result column="operation_urlpath" property="urlPath" jdbcType="VARCHAR"/>
+        <result column="operation_urlparam" property="urlParam" jdbcType="VARCHAR"/>
+        <result column="company_id" property="companyId" jdbcType="INTEGER"/>
+        <result column="operation_name" property="operationName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.ccx.credit.risk.model.AbsOperationRecord">
+        insert into abs_operation_record (id, operator, operation_time, basic_module,
+         concrete_module, operation_method, operation_urlpath, operation_urlparam, company_id, operation_name)
+        values (#{id}, #{operator}, #{operationTime}, #{basicModule}, #{concreteModule}, #{operationMethod},
+         #{urlPath}, #{urlParam}, #{companyId}, #{operationName})
+    </insert>
+
+    <!--查找企业名称-->
+    <select id="selectEnterPriseNameById" parameterType="java.lang.Integer" resultType="java.lang.String">
+       SELECT name operationName FROM abs_enterprise
+       WHERE id = #{id}
+    </select>
+
+    <!--查找资产名称-->
+    <select id="selectAssetNameById" parameterType="int" resultType="java.lang.String">
+        SELECT  name operationName FROM abs_asset
+        WHERE  id = #{id}
+    </select>
+
+    <!--查找资产包名称-->
+    <select id="selectAssetsPackageNameById" parameterType="int" resultType="java.lang.String">
+        SELECT  asset_package_name operationName FROM abs_assets_pakege
+        WHERE  id = #{id}
+    </select>
+
+    <!--查找角色名称-->
+    <select id="selectRoleNameById" parameterType="int" resultType="java.lang.String">
+        SELECT  name operationName FROM abs_role_fg
+        WHERE  id = #{id}
+    </select>
+
+    <!--查找用户名称-->
+    <select id="selectUserNameById" parameterType="int" resultType="java.lang.String">
+        SELECT  name operationName FROM abs_user_fg
+        WHERE  id = #{id}
+    </select>
+
+    <!--查找所有的日志记录 按照添加时间倒序-->
+    <select id="findAllRecord" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT * FROM abs_operation_record
+        ORDER BY operation_time DESC
+    </select>
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.gianmodel.GainModelMapper" >
+
+<!--
+获取资产包下面资产还款信息
+-->
+  <select id="getCashFlowList" resultType="java.util.Map">
+          SELECT
+        assets_id,DATE_FORMAT(repayment_date,    '%Y年%m月') repayment_date,repayment_amount
+    FROM
+        abs_assets_repayment
+    WHERE
+        EXISTS (
+            SELECT
+                1
+            FROM
+                abs_assets_pakege_msg
+            WHERE
+                assets_package_id = #{pakegeId}
+            AND assets_id = abs_assets_repayment.assets_id
+        )
+      <![CDATA[ and repayment_date>=#{stime} and repayment_date<=#{etime} ]]>
+
+      ORDER BY assets_id,repayment_date
+
+  </select>
+  <select id="getAssetsList" resultType="java.util.Map" parameterType="java.lang.Integer">
+         SELECT
+
+			t1.assets_id,t3.name
+		FROM
+			abs_assets_pakege_msg t1 join abs_asset t2
+on t1.assets_id=t2.id
+ join abs_enterprise t3
+on t2.enterprise_id =t3.id
+		WHERE
+			assets_package_id = #{pakegeId}
+
+  </select>
+  <select id="getRateLevel" resultType="java.util.Map">
+    SELECT
+        t1.rating_level,
+        break_rate,
+        month
+    FROM
+        abs_layer_defaulrates t1
+    JOIN rate_result t2 ON t1.rating_level = t2. NAME
+    ORDER BY
+        t2.id,
+        month
+
+  </select>
+  <select id="getRecoveryrates" resultType="java.util.Map">
+    SELECT
+        t1. name,
+        IFNULL(t2.recycle_rate, 0) recycle_rate
+    FROM
+        rate_result t1
+    LEFT JOIN abs_layer_recoveryrates t2 ON t1. NAME = t2.rating_level
+    ORDER BY
+        t1.id ASC
+  </select>
+    <!--获取主体相关性-->
+  <select id="getEnterpriseCorrelationIndex" resultType="java.util.Map" parameterType="java.lang.Integer">
+       SELECT
+        asset_id,
+        relevant_value
+    FROM
+        abs_layer_assets_relevant
+    WHERE
+        layer_id = #{layerId}
+  </select>
+    <!--获取相关性相关性参数-->
+  <select id="getCorrelationIndexParam" resultType="java.util.Map" >
+       SELECT param_name,param_value from abs_layer_correlation_setup ORDER BY id
+  </select>
+    <!--获取行业相关性参数-->
+    <select id="getInsdustryCorrelationIndex" resultType="java.util.Map" >
+       SELECT insdustry_first,insdustry_second,index_value from abs_layer_correlationindex
+  </select>
+    <!--获取相关性资产信息-->
+    <select id="getAsstesMsg" resultType="com.ccx.credit.risk.manager.modelmessage.AsstesMsg" parameterType="java.lang.Integer">
+           SELECT
+        assets_id assetsid,
+        t2.enterprise_id enterpriseid,
+        province_id provinceid,
+        t3. name,
+        t3.insdustry_bg_id bgid
+    FROM
+        abs_assets_pakege_msg t1
+    JOIN abs_asset t2 ON t1.assets_id = t2.id
+    JOIN (
+        SELECT
+            tt1.id,
+            tt1. name,
+            tt2.insdustry_bg_id,
+            tt1.province_id
+        FROM
+            abs_enterprise tt1
+        LEFT JOIN abs_layer_insdustry_relation tt2 ON tt1.industry2 = tt2.insdustry_fg_id
+    ) t3 ON t2.enterprise_id = t3.id
+    WHERE
+        assets_package_id = #{packageId}
+  </select>
+
+  <select id="getLayerLevel" resultType="java.util.Map" parameterType="java.lang.Integer">
+    SELECT
+        t2.layer_name,
+        t1.capital_rate,
+        t1.expect_earnings_rate,
+        t2.float_value,
+        t2.float_up,
+        t2.float_down,
+        t1.is_float
+    FROM
+        abs_assets_layer_level t1
+    JOIN abs_layer_level t2 ON t1.level_id = t2.id
+    WHERE
+        t1.layer_id = #{layerId}
+        ORDER BY t2.layer_order asc
+  </select>
+</mapper>

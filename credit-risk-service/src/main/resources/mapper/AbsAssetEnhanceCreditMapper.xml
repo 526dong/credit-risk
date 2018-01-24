@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.asset.AbsAssetEnhanceCreditMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.asset.AbsAssetEnhanceCredit" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, pid
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_asset_enhance_credit
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--通过父节点查询-->
+  <select id="findAllByPid" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select id, name, pid from abs_asset_enhance_credit where pid = #{pid,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_asset_enhance_credit
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.asset.AbsAssetEnhanceCredit" >
+    insert into abs_asset_enhance_credit (id, name, pid
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.asset.AbsAssetEnhanceCredit" >
+    update abs_asset_enhance_credit
+    set name = #{name,jdbcType=VARCHAR},
+      pid = #{pid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

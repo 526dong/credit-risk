@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.enterprise.EnterpriseReportCheckMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.enterprise.EnterpriseReportCheck" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="report_type" property="reportType" jdbcType="INTEGER" />
+    <result column="formula" property="formula" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, report_type, formula, create_date
+  </sql>
+  <!--通过财务报表类型加载联表公式-->
+  <select id="selectByReportType" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_enterprise_report_check
+    where report_type = #{0,jdbcType=INTEGER}
+  </select>
+</mapper>

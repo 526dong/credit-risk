@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.assetlayer.LayerSetupMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.assetlayer.LayerSetup" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="layer_id" property="layerId" jdbcType="INTEGER" />
+    <result column="asset_pakege_id" property="assetPakegeId" jdbcType="INTEGER" />
+    <result column="publish_capital" property="publishCapital" jdbcType="DECIMAL" />
+    <result column="close_package_time" property="closePackageTime" jdbcType="TIMESTAMP" />
+    <result column="found_time" property="foundTime" jdbcType="TIMESTAMP" />
+    <result column="predict_expire_time" property="predictExpireTime" jdbcType="TIMESTAMP" />
+    <result column="repayment_type" property="repaymentType" jdbcType="TINYINT" />
+    <result column="first_repayment_time" property="firstRepaymentTime" jdbcType="TIMESTAMP" />
+    <result column="repayment_interval_time" property="repaymentIntervalTime" jdbcType="INTEGER" />
+    <result column="repayment_time" property="repaymentTime" jdbcType="INTEGER" />
+    <result column="trusteeship_rate" property="trusteeshipRate" jdbcType="DECIMAL" />
+    <result column="manage_rate" property="manageRate" jdbcType="DECIMAL" />
+    <result column="grade_rate" property="gradeRate" jdbcType="DECIMAL" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="simulation_num" property="simulationNum" jdbcType="INTEGER" />
+    <result column="expedite_settlement_default_rate" property="expediteSettlementDefaultRate" jdbcType="DECIMAL" />
+    <result column="asset_num" property="assetNum" jdbcType="INTEGER" />
+    <result column="asset_ids" property="assetIds" jdbcType="VARCHAR" />
+    <result column="left_capital" property="leftCapital" jdbcType="DECIMAL" />
+    <result column="left_principal" property="leftPrincipal" jdbcType="DECIMAL" />
+    <result column="avg_year" property="avgYear" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, layer_id, asset_pakege_id, publish_capital, close_package_time, found_time, predict_expire_time, 
+    repayment_type, first_repayment_time, repayment_interval_time, repayment_time, trusteeship_rate, 
+    manage_rate, grade_rate, tax_rate, simulation_num, expedite_settlement_default_rate, 
+    asset_num, asset_ids, left_capital, left_principal, avg_year
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_layer_setup
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByLayerId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from abs_layer_setup
+    where layer_id = #{layerId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_layer_setup
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.assetlayer.LayerSetup" keyProperty="id" useGeneratedKeys="true" >
+    insert into abs_layer_setup (id, layer_id, asset_pakege_id, 
+      publish_capital, close_package_time, found_time, 
+      predict_expire_time, repayment_type, first_repayment_time, 
+      repayment_interval_time, repayment_time, trusteeship_rate, 
+      manage_rate, grade_rate, tax_rate, 
+      simulation_num, expedite_settlement_default_rate, 
+      asset_num, asset_ids, left_capital, 
+      left_principal, avg_year)
+    values (#{id,jdbcType=INTEGER}, #{layerId,jdbcType=INTEGER}, #{assetPakegeId,jdbcType=INTEGER}, 
+      #{publishCapital,jdbcType=DECIMAL}, #{closePackageTime,jdbcType=TIMESTAMP}, #{foundTime,jdbcType=TIMESTAMP}, 
+      #{predictExpireTime,jdbcType=TIMESTAMP}, #{repaymentType,jdbcType=TINYINT}, #{firstRepaymentTime,jdbcType=TIMESTAMP}, 
+      #{repaymentIntervalTime,jdbcType=INTEGER}, #{repaymentTime,jdbcType=INTEGER}, #{trusteeshipRate,jdbcType=DECIMAL}, 
+      #{manageRate,jdbcType=DECIMAL}, #{gradeRate,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL}, 
+      #{simulationNum,jdbcType=INTEGER}, #{expediteSettlementDefaultRate,jdbcType=DECIMAL}, 
+      #{assetNum,jdbcType=INTEGER}, #{assetIds,jdbcType=VARCHAR}, #{leftCapital,jdbcType=DECIMAL}, 
+      #{leftPrincipal,jdbcType=DECIMAL}, #{avgYear,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ccx.credit.risk.model.assetlayer.LayerSetup" >
+    insert into abs_layer_setup
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="layerId != null" >
+        layer_id,
+      </if>
+      <if test="assetPakegeId != null" >
+        asset_pakege_id,
+      </if>
+      <if test="publishCapital != null" >
+        publish_capital,
+      </if>
+      <if test="closePackageTime != null" >
+        close_package_time,
+      </if>
+      <if test="foundTime != null" >
+        found_time,
+      </if>
+      <if test="predictExpireTime != null" >
+        predict_expire_time,
+      </if>
+      <if test="repaymentType != null" >
+        repayment_type,
+      </if>
+      <if test="firstRepaymentTime != null" >
+        first_repayment_time,
+      </if>
+      <if test="repaymentIntervalTime != null" >
+        repayment_interval_time,
+      </if>
+      <if test="repaymentTime != null" >
+        repayment_time,
+      </if>
+      <if test="trusteeshipRate != null" >
+        trusteeship_rate,
+      </if>
+      <if test="manageRate != null" >
+        manage_rate,
+      </if>
+      <if test="gradeRate != null" >
+        grade_rate,
+      </if>
+      <if test="taxRate != null" >
+        tax_rate,
+      </if>
+      <if test="simulationNum != null" >
+        simulation_num,
+      </if>
+      <if test="expediteSettlementDefaultRate != null" >
+        expedite_settlement_default_rate,
+      </if>
+      <if test="assetNum != null" >
+        asset_num,
+      </if>
+      <if test="assetIds != null" >
+        asset_ids,
+      </if>
+      <if test="leftCapital != null" >
+        left_capital,
+      </if>
+      <if test="leftPrincipal != null" >
+        left_principal,
+      </if>
+      <if test="avgYear != null" >
+        avg_year,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="layerId != null" >
+        #{layerId,jdbcType=INTEGER},
+      </if>
+      <if test="assetPakegeId != null" >
+        #{assetPakegeId,jdbcType=INTEGER},
+      </if>
+      <if test="publishCapital != null" >
+        #{publishCapital,jdbcType=DECIMAL},
+      </if>
+      <if test="closePackageTime != null" >
+        #{closePackageTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="foundTime != null" >
+        #{foundTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="predictExpireTime != null" >
+        #{predictExpireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="repaymentType != null" >
+        #{repaymentType,jdbcType=TINYINT},
+      </if>
+      <if test="firstRepaymentTime != null" >
+        #{firstRepaymentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="repaymentIntervalTime != null" >
+        #{repaymentIntervalTime,jdbcType=INTEGER},
+      </if>
+      <if test="repaymentTime != null" >
+        #{repaymentTime,jdbcType=INTEGER},
+      </if>
+      <if test="trusteeshipRate != null" >
+        #{trusteeshipRate,jdbcType=DECIMAL},
+      </if>
+      <if test="manageRate != null" >
+        #{manageRate,jdbcType=DECIMAL},
+      </if>
+      <if test="gradeRate != null" >
+        #{gradeRate,jdbcType=DECIMAL},
+      </if>
+      <if test="taxRate != null" >
+        #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="simulationNum != null" >
+        #{simulationNum,jdbcType=INTEGER},
+      </if>
+      <if test="expediteSettlementDefaultRate != null" >
+        #{expediteSettlementDefaultRate,jdbcType=DECIMAL},
+      </if>
+      <if test="assetNum != null" >
+        #{assetNum,jdbcType=INTEGER},
+      </if>
+      <if test="assetIds != null" >
+        #{assetIds,jdbcType=VARCHAR},
+      </if>
+      <if test="leftCapital != null" >
+        #{leftCapital,jdbcType=DECIMAL},
+      </if>
+      <if test="leftPrincipal != null" >
+        #{leftPrincipal,jdbcType=DECIMAL},
+      </if>
+      <if test="avgYear != null" >
+        #{avgYear,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccx.credit.risk.model.assetlayer.LayerSetup" >
+    update abs_layer_setup
+    <set >
+      <if test="layerId != null" >
+        layer_id = #{layerId,jdbcType=INTEGER},
+      </if>
+      <if test="assetPakegeId != null" >
+        asset_pakege_id = #{assetPakegeId,jdbcType=INTEGER},
+      </if>
+      <if test="publishCapital != null" >
+        publish_capital = #{publishCapital,jdbcType=DECIMAL},
+      </if>
+      <if test="closePackageTime != null" >
+        close_package_time = #{closePackageTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="foundTime != null" >
+        found_time = #{foundTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="predictExpireTime != null" >
+        predict_expire_time = #{predictExpireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="repaymentType != null" >
+        repayment_type = #{repaymentType,jdbcType=TINYINT},
+      </if>
+      <if test="firstRepaymentTime != null" >
+        first_repayment_time = #{firstRepaymentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="repaymentIntervalTime != null" >
+        repayment_interval_time = #{repaymentIntervalTime,jdbcType=INTEGER},
+      </if>
+      <if test="repaymentTime != null" >
+        repayment_time = #{repaymentTime,jdbcType=INTEGER},
+      </if>
+      <if test="trusteeshipRate != null" >
+        trusteeship_rate = #{trusteeshipRate,jdbcType=DECIMAL},
+      </if>
+      <if test="manageRate != null" >
+        manage_rate = #{manageRate,jdbcType=DECIMAL},
+      </if>
+      <if test="gradeRate != null" >
+        grade_rate = #{gradeRate,jdbcType=DECIMAL},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="simulationNum != null" >
+        simulation_num = #{simulationNum,jdbcType=INTEGER},
+      </if>
+      <if test="expediteSettlementDefaultRate != null" >
+        expedite_settlement_default_rate = #{expediteSettlementDefaultRate,jdbcType=DECIMAL},
+      </if>
+      <if test="assetNum != null" >
+        asset_num = #{assetNum,jdbcType=INTEGER},
+      </if>
+      <if test="assetIds != null" >
+        asset_ids = #{assetIds,jdbcType=VARCHAR},
+      </if>
+      <if test="leftCapital != null" >
+        left_capital = #{leftCapital,jdbcType=DECIMAL},
+      </if>
+      <if test="leftPrincipal != null" >
+        left_principal = #{leftPrincipal,jdbcType=DECIMAL},
+      </if>
+      <if test="avgYear != null" >
+        avg_year = #{avgYear,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.assetlayer.LayerSetup" >
+    update abs_layer_setup
+    set layer_id = #{layerId,jdbcType=INTEGER},
+      asset_pakege_id = #{assetPakegeId,jdbcType=INTEGER},
+      publish_capital = #{publishCapital,jdbcType=DECIMAL},
+      close_package_time = #{closePackageTime,jdbcType=TIMESTAMP},
+      found_time = #{foundTime,jdbcType=TIMESTAMP},
+      predict_expire_time = #{predictExpireTime,jdbcType=TIMESTAMP},
+      repayment_type = #{repaymentType,jdbcType=TINYINT},
+      first_repayment_time = #{firstRepaymentTime,jdbcType=TIMESTAMP},
+      repayment_interval_time = #{repaymentIntervalTime,jdbcType=INTEGER},
+      repayment_time = #{repaymentTime,jdbcType=INTEGER},
+      trusteeship_rate = #{trusteeshipRate,jdbcType=DECIMAL},
+      manage_rate = #{manageRate,jdbcType=DECIMAL},
+      grade_rate = #{gradeRate,jdbcType=DECIMAL},
+      tax_rate = #{taxRate,jdbcType=DECIMAL},
+      simulation_num = #{simulationNum,jdbcType=INTEGER},
+      expedite_settlement_default_rate = #{expediteSettlementDefaultRate,jdbcType=DECIMAL},
+      asset_num = #{assetNum,jdbcType=INTEGER},
+      asset_ids = #{assetIds,jdbcType=VARCHAR},
+      left_capital = #{leftCapital,jdbcType=DECIMAL},
+      left_principal = #{leftPrincipal,jdbcType=DECIMAL},
+      avg_year = #{avgYear,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getByLayerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+      from abs_layer_setup
+    where layer_id = #{0}
+  </select>
+</mapper>

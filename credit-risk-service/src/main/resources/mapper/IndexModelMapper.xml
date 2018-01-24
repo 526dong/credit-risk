@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.rate.IndexModelMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.index.IndexModel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="industry_id" property="industryId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="report_type_id" property="reportTypeId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, code, type, industry_id, name, report_type_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_index_model
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--通过评分和模型id获取评分等级-->
+  <select id="getResultByModelIdAndValue" resultType="com.ccx.credit.risk.model.index.IndexModelRule">
+    SELECT score, degree
+    FROM abs_index_model_rule
+    <where>
+      model_id = #{modelId, jdbcType=INTEGER}
+      <if test="value == 10.0">
+        AND value_max = 10
+      </if>
+      <if test="value != 10.0">
+        AND #{value, jdbcType=DOUBLE} <![CDATA[>=]]> value_min
+        AND #{value, jdbcType=DOUBLE} <![CDATA[<]]> value_max
+      </if>
+    </where>
+  </select>
+</mapper>

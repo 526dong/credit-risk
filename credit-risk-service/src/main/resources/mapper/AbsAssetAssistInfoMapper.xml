@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.asset.AbsAssetAssistInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.asset.AbsAssetAssistInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="asset_id" property="assetId" jdbcType="INTEGER" />
+    <result column="enterprise_tenant" property="enterpriseTenant" jdbcType="LONGVARCHAR" />
+    <result column="enterprise_seller" property="enterpriseSeller" jdbcType="LONGVARCHAR" />
+    <result column="enterprise_buyer" property="enterpriseBuyer" jdbcType="LONGVARCHAR" />
+    <result column="enterprise_enhance" property="enterpriseEnhance" jdbcType="LONGVARCHAR" />
+    <result column="enterprise_borrow" property="enterpriseBorrow" jdbcType="LONGVARCHAR" />
+    <result column="other_measure_credit_enhance" property="otherMeasureCreditEnhance" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, asset_id, enterprise_tenant, enterprise_seller, enterprise_buyer, enterprise_enhance, enterprise_borrow,
+    other_measure_credit_enhance
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_asset_assist_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="getByAssetId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from abs_asset_assist_info
+    where asset_id = #{assetId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_asset_assist_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <!--通过资产id删除资产辅助信息-->
+  <delete id="deleteByAssetId" parameterType="java.lang.Integer" >
+    delete from abs_asset_assist_info
+    where asset_id = #{assetId,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.asset.AbsAssetAssistInfo" >
+    insert into abs_asset_assist_info (id, asset_id, enterprise_tenant, 
+      enterprise_seller, enterprise_buyer,
+      enterprise_enhance, enterprise_borrow, 
+      other_measure_credit_enhance)
+    values (#{id,jdbcType=INTEGER}, #{assetId,jdbcType=INTEGER}, #{enterpriseTenant,jdbcType=LONGVARCHAR}, 
+      #{enterpriseSeller,jdbcType=LONGVARCHAR}, #{enterpriseBuyer,jdbcType=LONGVARCHAR},
+      #{enterpriseEnhance,jdbcType=LONGVARCHAR}, #{enterpriseBorrow,jdbcType=LONGVARCHAR}, 
+      #{otherMeasureCreditEnhance,jdbcType=LONGVARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.asset.AbsAssetAssistInfo" >
+    update abs_asset_assist_info
+    set enterprise_tenant = #{enterpriseTenant,jdbcType=LONGVARCHAR},
+      enterprise_seller = #{enterpriseSeller,jdbcType=LONGVARCHAR},
+      enterprise_buyer = #{enterpriseBuyer,jdbcType=LONGVARCHAR},
+      enterprise_enhance = #{enterpriseEnhance,jdbcType=LONGVARCHAR},
+      enterprise_borrow = #{enterpriseBorrow,jdbcType=LONGVARCHAR},
+      other_measure_credit_enhance = #{otherMeasureCreditEnhance,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

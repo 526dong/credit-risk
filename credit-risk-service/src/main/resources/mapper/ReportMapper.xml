@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.enterprise.ReportMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.enterprise.Report" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="report_time" property="reportTime" jdbcType="VARCHAR" />
+    <result column="cal" property="cal" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="name" property="reportName" jdbcType="VARCHAR" />
+    <result column="cycle" property="cycle" jdbcType="INTEGER" />
+    <result column="is_audit" property="audit" jdbcType="INTEGER" />
+    <result column="currency" property="currency" jdbcType="INTEGER" />
+    <result column="audit_unit" property="auditUnit" jdbcType="VARCHAR" />
+    <result column="audit_opinion" property="auditOpinion" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="creator_name" property="creatorName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="is_delete_flag" property="deleteFlag" jdbcType="INTEGER" />
+    <result column="approval_status" property="approvalStatus" jdbcType="INTEGER" />
+
+    <!--&lt;!&ndash; 企业性质 &ndash;&gt;
+    <association property="reportName" select="findReportNameByType" column="{id=type}"></association>-->
+  </resultMap>
+  
+  <resultMap id="BaseResult" type="com.ccx.credit.risk.model.enterprise.Report" >
+    <result column="report_time" property="reportTime" jdbcType="VARCHAR" />
+    <result column="cal" property="cal" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="name" property="reportName" jdbcType="VARCHAR" />
+    <result column="cycle" property="cycle" jdbcType="INTEGER" />
+    <result column="is_audit" property="audit" jdbcType="INTEGER" />
+    <result column="currency" property="currency" jdbcType="INTEGER" />
+    <result column="audit_unit" property="auditUnit" jdbcType="VARCHAR" />
+    <result column="audit_opinion" property="auditOpinion" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="creator_name" property="creatorName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="approval_status" property="approvalStatus" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, report_time, cal, type, cycle, is_audit, currency, audit_unit, audit_opinion, state
+    creator_name, create_date, update_date, company_id, is_delete_flag
+  </sql>
+  
+  <select id="findByEnterpriseId" resultMap="BaseResult" parameterType="java.lang.Integer" >
+    select distinct report.id id, report_time, cal, type, reportType.name, cycle, is_audit, currency, audit_unit,
+    	audit_opinion, report.creator_name, report.create_date, report.update_date, report.company_id, report.state, rel.approval_status
+    from abs_enterprise_report report,
+    abs_enterprise_report_relation rel,
+    abs_enterprise_report_type reportType
+	    where report.is_delete_flag = 0
+	    and reportType.status = 0
+	    and reportType.id = report.type
+	    and rel.enterprise_id = #{enterpriseId,jdbcType=INTEGER}
+	    and rel.report_id = report.id 
+	    order by report.create_date DESC
+  </select>
+
+  <select id="findNewReportByEnt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    SELECT count(*) count FROM
+    abs_enterprise_report report,
+    abs_enterprise_report_relation rel
+    WHERE report.id = rel.report_id
+    AND report.is_delete_flag = 0
+    AND rel.enterprise_id = #{enterpriseId,jdbcType=INTEGER}
+    AND rel.approval_status != 2
+  </select>
+  
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List"></include>
+    from abs_enterprise_report 
+	where is_delete_flag = 0
+    AND id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="findByReportTimeAndCal" resultType="java.lang.Integer" parameterType="java.util.Map" >
+    select
+    count(*)
+    from abs_enterprise_report rep, abs_enterprise_report_relation rel
+    where rel.report_id = rep.id
+    and rep.is_delete_flag = 0
+    and rel.enterprise_id = #{enterpriseId}
+    and rep.report_time = #{reportTime}
+    and rep.cal = #{cal}
+  </select>
+
+  <!--通过报表概况表中的报表类型查询报表名称-->
+  <select id="findReportNameByType" resultType="java.lang.String" parameterType="java.util.Map">
+    select name
+    from abs_enterprise_report_type
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <!--AND status = 0-->
+
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.ccx.credit.risk.model.enterprise.Report" >
+    insert into abs_enterprise_report (
+    	report_time, cal, type, cycle, is_audit, currency, audit_unit, audit_opinion, state,
+    	creator_name, create_date, update_date, company_id)
+    values (#{reportTime,jdbcType=VARCHAR}, #{cal,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
+      #{cycle,jdbcType=INTEGER}, #{audit,jdbcType=INTEGER}, #{currency,jdbcType=INTEGER}, 
+      #{auditUnit,jdbcType=VARCHAR}, #{auditOpinion,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER},
+      #{creatorName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+      #{companyId,jdbcType=INTEGER}) 
+  </insert>
+  <!-- select @@identity -->
+
+  <insert id="insertRelation" parameterType="java.util.Map" >
+    insert into abs_enterprise_report_relation (enterprise_id, report_id)
+    	values (#{enterpriseId,jdbcType=INTEGER}, #{reportId,jdbcType=INTEGER})
+  </insert>
+  
+  <delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from abs_enterprise_report
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteRelationByReportId" parameterType="java.lang.Integer" >
+    delete from abs_enterprise_report_relation
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </delete>
+
+  <!--修改删除状态为是-标识已经删除-->
+  <update id="updateDeleteFlagById" parameterType="java.lang.Integer" >
+    update abs_enterprise_report
+    set is_delete_flag = 1
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="update" parameterType="com.ccx.credit.risk.model.enterprise.Report" >
+    update abs_enterprise_report
+    set report_time = #{reportTime,jdbcType=VARCHAR},
+      cal = #{cal,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      cycle = #{cycle,jdbcType=INTEGER},
+      is_audit = #{audit,jdbcType=INTEGER},
+      currency = #{currency,jdbcType=INTEGER}, 
+      audit_unit = #{auditUnit,jdbcType=VARCHAR},
+      audit_opinion = #{auditOpinion,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--根据ids查报告-->
+  <select id="findReportListByIds" parameterType="java.util.List" resultMap="BaseResult">
+    SELECT r.id id, report_time, cal, type, reportType.name, cycle, is_audit, currency, audit_unit,
+      audit_opinion, r.creator_name, r.create_date, update_date, company_id, state, re.approval_status
+    FROM abs_enterprise_report r, abs_enterprise_report_relation re, abs_enterprise_report_type reportType
+    WHERE r.id IN
+    <foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+    </foreach>
+      AND r.id = re.report_id
+      and r.is_delete_flag = 0
+    and reportType.status = 0
+    and reportType.id = r.type
+    ORDER BY report_time DESC
+  </select>
+
+  <!--根据entid查报告-->
+  <select id="findApprovalReportByEntId" resultMap="BaseResultMap">
+    select report.id id, report_time, cal, type
+      from abs_enterprise_report report,abs_enterprise_report_relation rel
+    where rel.enterprise_id = #{enterpriseId, jdbcType=INTEGER}
+    and rel.report_id = report.id
+    and report.is_delete_flag = 0
+    <if test="null != approvalStatus">
+      and rel.approval_status = #{approvalStatus, jdbcType=INTEGER}
+    </if>
+    <if test="null != cal">
+      and report.cal = #{cal, jdbcType=INTEGER}
+    </if>
+  </select>
+</mapper>

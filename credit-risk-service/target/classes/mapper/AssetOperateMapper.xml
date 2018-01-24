@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.asset.AssetOperateMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.asset.AssetOperate" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="operator" property="operator" jdbcType="VARCHAR" />
+    <result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+    <result column="operate_record" property="operateRecord" jdbcType="VARCHAR" />
+    <result column="asset_id" property="assetId" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, operator, operate_time, operate_record, asset_id
+  </sql>
+  
+  <select id="findByAssetId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_asset_operate
+    where asset_id = #{assetId,jdbcType=INTEGER}
+  </select>
+  
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.asset.AssetOperate" >
+    insert into abs_asset_operate (id, operator, operate_time, 
+      operate_record, asset_id)
+    values (#{id,jdbcType=INTEGER}, #{operator,jdbcType=VARCHAR}, #{operateTime,jdbcType=TIMESTAMP}, 
+      #{operateRecord,jdbcType=VARCHAR}, #{assetId,jdbcType=INTEGER})
+  </insert>
+</mapper>

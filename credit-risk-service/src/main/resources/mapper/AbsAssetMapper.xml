@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.asset.AbsAssetMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.asset.AbsAsset" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="apply_code" property="applyCode" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="business_type" property="businessType" jdbcType="INTEGER" />
+    <result column="business_name" property="businessName" jdbcType="VARCHAR" />
+    <result column="tenant_ent" property="tenantEnt" jdbcType="VARCHAR" />
+    <result column="seller_ent" property="sellerEnt" jdbcType="VARCHAR" />
+    <result column="buyer_ent" property="buyerEnt" jdbcType="VARCHAR" />
+    <result column="borrow_ent" property="borrowEnt" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="asset_end_reason" property="assetEndReason" jdbcType="VARCHAR" />
+    <result column="bond_principal" property="bondPrincipal" jdbcType="DECIMAL" />
+    <result column="time_limit" property="timeLimit" jdbcType="INTEGER" />
+    <result column="interest_rate_type" property="interestRateType" jdbcType="INTEGER" />
+    <result column="annual_interest_rate" property="annualInterestRate" jdbcType="DECIMAL" />
+    <result column="irr" property="irr" jdbcType="DECIMAL" />
+    <result column="fee_collect_type_and_rate" property="feeCollectTypeAndRate" jdbcType="VARCHAR" />
+    <result column="put_date" property="putDate" jdbcType="TIMESTAMP" />
+    <result column="ent_id" property="entId" jdbcType="INTEGER" />
+    <result column="ent_name" property="entName" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="VARCHAR" />
+    <result column="ent_shadow_id" property="entShadowId" jdbcType="INTEGER" />
+    <result column="ent_shadow_name" property="entShadowName" jdbcType="VARCHAR" />
+    <result column="shadow_level" property="shadowLevel" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="industry1" property="industry1" jdbcType="VARCHAR" />
+    <result column="industry2" property="industry2" jdbcType="VARCHAR" />
+    <result column="creator_name" property="operator" jdbcType="VARCHAR" />
+    <result column="create_date" property="operateDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="company_id" property="companyId" jdbcType="TIMESTAMP" />
+
+    <!--业务类型名称-->
+    <association property="businessTypeName" select="findBusinessNameById" column="{id=business_type,type=type}"></association>
+
+  </resultMap>
+  
+  <resultMap id="enterpriseMap" type="com.ccx.credit.risk.model.asset.AssetCount" >
+    <result column="industry1" property="industry1" jdbcType="VARCHAR" />
+    <result column="area" property="area" jdbcType="VARCHAR" />
+    <result column="scale" property="scale" jdbcType="VARCHAR" />
+    <result column="business" property="business" jdbcType="VARCHAR" />
+    <result column="count" property="count" jdbcType="VARCHAR" />
+    <result column="maxDay" property="maxDay" jdbcType="VARCHAR" />
+    <result column="money" property="money" jdbcType="VARCHAR" />
+    <result column="bondPrincipal" property="bondPrincipal" jdbcType="VARCHAR" />
+    <result column="putDate" property="putDate" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List" >
+    id, name, code, apply_code, type, business_type, business_name, tenant_ent, seller_ent, buyer_ent, borrow_ent,
+    state, asset_end_reason, bond_principal, time_limit, interest_rate_type, annual_interest_rate, irr, fee_collect_type_and_rate,
+    put_date, ent_id, ent_name, level, ent_shadow_id, ent_shadow_name, shadow_level, creator_name, create_date, update_date, company_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_asset
+    where is_delete_flag = 0
+    AND id = #{id,jdbcType=INTEGER}
+  </select>
+  <!--分页查询-->
+  <select id="findAll" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select
+    <include refid="Base_Column_List" />
+    from abs_asset
+    <where>
+      is_delete_flag = 0
+      and type = #{type,jdbcType=INTEGER}
+        <if test="null!=keyWord and ''!=keyWord">
+            and
+            (
+                <if test="type == 0">
+                    tenant_ent like concat('%', #{keyWord},'%')
+                </if>
+                <if test="type == 1">
+                    buyer_ent like concat('%', #{keyWord},'%')
+                </if>
+                <if test="type == 2">
+                    borrow_ent like concat('%', #{keyWord},'%')
+                </if>
+                  or apply_code like concat('%', #{keyWord},'%')
+                  or name like concat('%',#{keyWord},'%')
+                  or creator_name like concat('%',#{keyWord},'%')
+            )
+        </if>
+    </where>
+    order by create_date DESC
+  </select>
+  <!--查询资产申请编号-->
+  <select id="findByApplyCode" resultType="java.lang.Integer" parameterType="java.lang.String" >
+    select
+    count(*)
+    from abs_asset
+    where is_delete_flag = 0
+    AND apply_code = #{applyCode,jdbcType=VARCHAR}
+  </select>
+  <!--资产名称唯一-->
+  <select id="validateName" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select
+    count(*)
+    from abs_asset
+    where is_delete_flag = 0
+    AND name = #{name,jdbcType=VARCHAR}
+  </select>
+  <!--资产编号唯一-->
+  <select id="validateCode" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select
+    count(*)
+    from abs_asset
+    where is_delete_flag = 0
+    AND code = #{code,jdbcType=VARCHAR}
+  </select>
+  <!--查询所有的评级企业-->
+  <select id="findAllRateEnt" resultType="java.util.Map">
+    SELECT
+      ent.id entId, ent.name entName, ent.province_id province,
+      (select name from abs_enterprise_industry where id = ent.industry1) industry1,
+	  (select name from abs_enterprise_industry where id = ent.industry2) industry2,
+	  app.rating_result rateResult, app.shadow_rating_result shadowRateResult
+    FROM
+      abs_enterprise ent,
+      abs_enterprise_approval app
+    WHERE
+      ent.id = app.enterprise_id
+      AND app.approval_status = 2
+    GROUP BY entId
+  </select>
+  <!--查询所有的评级结果-->
+  <select id="findAllRateResult" resultType="java.util.Map">
+    SELECT
+    id, name, priority
+    FROM
+    rate_result
+  </select>
+  <!--查询所有的业务类型-->
+  <select id="findAllBusinessType" resultType="java.util.Map" parameterType="java.lang.Integer">
+    SELECT
+    id, name
+    FROM
+    abs_asset_business_type
+    WHERE type = #{type,jdbcType=INTEGER}
+  </select>
+  <!--通过id查询name-->
+  <select id="findBusinessNameById" resultType="java.lang.String" parameterType="java.util.Map">
+    SELECT
+      name
+    FROM
+    abs_asset_business_type
+    WHERE id = #{id,jdbcType=INTEGER}
+    AND type = #{type,jdbcType=INTEGER}
+  </select>
+  <!--逻辑删除-->
+  <update id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    update abs_asset
+    set is_delete_flag = 1
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.ccx.credit.risk.model.asset.AbsAsset" >
+    insert into abs_asset (name, code, apply_code,
+      type, business_type, business_name, tenant_ent, seller_ent, buyer_ent, borrow_ent, state, asset_end_reason,
+      bond_principal, time_limit, interest_rate_type,
+      annual_interest_rate, irr, fee_collect_type_and_rate, 
+      put_date, creator_name, create_date, company_id)
+    values (#{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{applyCode,jdbcType=VARCHAR},
+      #{type,jdbcType=INTEGER}, #{businessType,jdbcType=INTEGER}, #{businessName,jdbcType=VARCHAR},
+      #{tenantEnt,jdbcType=VARCHAR}, #{sellerEnt,jdbcType=VARCHAR}, #{buyerEnt,jdbcType=VARCHAR}, #{borrowEnt,jdbcType=VARCHAR},
+      #{state,jdbcType=INTEGER}, #{assetEndReason,jdbcType=VARCHAR},
+      #{bondPrincipal,jdbcType=DECIMAL}, #{timeLimit,jdbcType=INTEGER}, #{interestRateType,jdbcType=INTEGER},
+      #{annualInterestRate,jdbcType=DECIMAL}, #{irr,jdbcType=DECIMAL}, #{feeCollectTypeAndRate,jdbcType=VARCHAR}, 
+      #{putDate,jdbcType=TIMESTAMP}, #{operator,jdbcType=VARCHAR}, #{operateDate,jdbcType=TIMESTAMP}, #{companyId,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.asset.AbsAsset" >
+    update abs_asset
+    set name = #{name,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      business_type = #{businessType,jdbcType=INTEGER},
+      business_name = #{businessName,jdbcType=VARCHAR},
+      tenant_ent = #{tenantEnt,jdbcType=VARCHAR},
+      seller_ent = #{sellerEnt,jdbcType=VARCHAR},
+      buyer_ent = #{buyerEnt,jdbcType=VARCHAR},
+      borrow_ent = #{borrowEnt,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      asset_end_reason = #{assetEndReason,jdbcType=VARCHAR},
+      bond_principal = #{bondPrincipal,jdbcType=DECIMAL},
+      time_limit = #{timeLimit,jdbcType=INTEGER},
+      interest_rate_type = #{interestRateType,jdbcType=INTEGER},
+      annual_interest_rate = #{annualInterestRate,jdbcType=DECIMAL},
+      irr = #{irr,jdbcType=DECIMAL},
+      fee_collect_type_and_rate = #{feeCollectTypeAndRate,jdbcType=VARCHAR},
+      put_date = #{putDate,jdbcType=TIMESTAMP},
+      ent_id = #{entId,jdbcType=INTEGER},
+      ent_name = #{entName,jdbcType=VARCHAR},
+      level = #{level,jdbcType=VARCHAR},
+      ent_shadow_id = #{entShadowId,jdbcType=INTEGER},
+      ent_shadow_name = #{entShadowName,jdbcType=VARCHAR},
+      shadow_level = #{shadowLevel,jdbcType=VARCHAR},
+      province = #{province,jdbcType=VARCHAR},
+      industry1 = #{industry1,jdbcType=VARCHAR},
+      industry2 = #{industry2,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--通过统计维度统计分布情况-->
+  <select id="analyseDimCount" resultMap="enterpriseMap">
+  	SELECT
+  		<if test="type == 1">
+			c.industry1 as bothName,
+		</if>
+		<if test="type == 2">
+			c.industry2 as bothName,
+		</if>
+		<if test="type == 3">
+			c.province as bothName,
+		</if>
+		<if test="type == 4">
+			(SELECT name from abs_asset_business_type where type=#{assetType} and id=c.business_type) as bothName,
+		</if>
+		<if test="type == 5">
+			c.level as bothName,
+		</if>
+		COUNT(c.id) AS count,
+		SUM(c.bond_Principal) AS putMoney,
+		SUM(b.money) AS almoney
+		FROM abs_asset c LEFT JOIN
+			(
+				SELECT
+					(
+						SUM(a.repayment_amount) + SUM(a.repayment_Interest)
+					) money,
+					a.assets_id,
+			a.repayment_date
+				FROM
+					abs_assets_repayment a
+				WHERE a.repayment_date >  DATE_SUB(CURDATE(), INTERVAL 1 DAY) 
+				GROUP BY
+					a.assets_id
+			) b ON b.assets_id = c.id
+		WHERE
+			1 = 1 
+		AND c.type = #{assetType}
+		AND c.is_delete_flag = 0
+		and c.put_date <![CDATA[  <  ]]> CURDATE()
+		and c.put_date <![CDATA[  >=  ]]> DATE_SUB(CURDATE(),INTERVAL 1 DAY)
+		<if test="type == 1">
+			GROUP BY c.industry1
+		</if>
+		<if test="type == 2">
+			GROUP BY c.industry2
+		</if>
+		<if test="type == 3">
+			GROUP BY c.province
+		</if>
+		<if test="type == 4">
+			GROUP BY c.business_type
+		</if>
+		<if test="type == 5">
+			GROUP BY c.level
+		</if>
+		ORDER BY
+			count DESC
+  
+  </select>
+  
+
+  <!--统计资产池剩余本金余额-->
+  <select id="assetMoneyCount" resultMap="enterpriseMap">
+  	SELECT
+		MAX(a.repayment_date) maxDay,
+	    SUM(a.repayment_amount) money,
+	    b.bond_principal as bondPrincipal,
+	    b.put_date as putDate
+	FROM
+			abs_assets_repayment a,abs_asset b 
+		where a.assets_id = b.id
+		and b.type = #{assetType}
+		AND b.is_delete_flag = 0
+		and b.put_date  <![CDATA[  <  ]]> CURDATE()
+		and b.put_date  <![CDATA[  >=  ]]> DATE_SUB(CURDATE(),INTERVAL 1 DAY)
+	GROUP BY b.id
+  </select>
+</mapper>

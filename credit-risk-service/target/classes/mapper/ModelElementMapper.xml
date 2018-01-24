@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.element.ModelElementMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.element.ModelElement" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="industry_id" property="industryId" jdbcType="INTEGER" />
+    <result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, code, name, industry_id, enterprise_type
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_model_element
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--通过行业modelId查找因素id-->
+  <select id="getListByModelId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select id, name
+      from abs_model_element
+    where model_id = #{0} and state = 1
+  </select>
+</mapper>

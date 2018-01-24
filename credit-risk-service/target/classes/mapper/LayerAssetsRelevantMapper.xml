@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.assetlayer.LayerAssetsRelevantMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.assetlayer.LayerAssetsRelevant" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="layer_id" property="layerId" jdbcType="INTEGER" />
+    <result column="asset_pakege_id" property="assetPakegeId" jdbcType="INTEGER" />
+    <result column="asset_id" property="assetId" jdbcType="INTEGER" />
+    <result column="relevant_value" property="relevantValue" jdbcType="INTEGER" />
+    <result column="creator_name" property="creatorName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, layer_id, asset_pakege_id, asset_id, relevant_value, creator_name, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_layer_assets_relevant
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_layer_assets_relevant
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.assetlayer.LayerAssetsRelevant" >
+    insert into abs_layer_assets_relevant (id, layer_id, asset_pakege_id, 
+      asset_id, relevant_value, creator_name, 
+      create_time)
+    values (#{id,jdbcType=INTEGER}, #{layerId,jdbcType=INTEGER}, #{assetPakegeId,jdbcType=INTEGER}, 
+      #{assetId,jdbcType=INTEGER}, #{relevantValue,jdbcType=INTEGER}, #{creatorName,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ccx.credit.risk.model.assetlayer.LayerAssetsRelevant" >
+    insert into abs_layer_assets_relevant
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="layerId != null" >
+        layer_id,
+      </if>
+      <if test="assetPakegeId != null" >
+        asset_pakege_id,
+      </if>
+      <if test="assetId != null" >
+        asset_id,
+      </if>
+      <if test="relevantValue != null" >
+        relevant_value,
+      </if>
+      <if test="creatorName != null" >
+        creator_name,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="layerId != null" >
+        #{layerId,jdbcType=INTEGER},
+      </if>
+      <if test="assetPakegeId != null" >
+        #{assetPakegeId,jdbcType=INTEGER},
+      </if>
+      <if test="assetId != null" >
+        #{assetId,jdbcType=INTEGER},
+      </if>
+      <if test="relevantValue != null" >
+        #{relevantValue,jdbcType=INTEGER},
+      </if>
+      <if test="creatorName != null" >
+        #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccx.credit.risk.model.assetlayer.LayerAssetsRelevant" >
+    update abs_layer_assets_relevant
+    <set >
+      <if test="layerId != null" >
+        layer_id = #{layerId,jdbcType=INTEGER},
+      </if>
+      <if test="assetPakegeId != null" >
+        asset_pakege_id = #{assetPakegeId,jdbcType=INTEGER},
+      </if>
+      <if test="assetId != null" >
+        asset_id = #{assetId,jdbcType=INTEGER},
+      </if>
+      <if test="relevantValue != null" >
+        relevant_value = #{relevantValue,jdbcType=INTEGER},
+      </if>
+      <if test="creatorName != null" >
+        creator_name = #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.assetlayer.LayerAssetsRelevant" >
+    update abs_layer_assets_relevant
+    set layer_id = #{layerId,jdbcType=INTEGER},
+      asset_pakege_id = #{assetPakegeId,jdbcType=INTEGER},
+      asset_id = #{assetId,jdbcType=INTEGER},
+      relevant_value = #{relevantValue,jdbcType=INTEGER},
+      creator_name = #{creatorName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getAssetList" parameterType="java.util.Map" resultType="com.ccx.credit.risk.model.assetlayer.LayerAssetsRelevant">
+    SELECT al.*
+      FROM (
+            SELECT ass.*, r.relevant_value, r.id, r.asset_pakege_id, r.layer_id
+              FROM (
+                    SELECT a.id asset_id, a.code, a.name, a.create_date create_time, a.creator_name, ent.name enterprise_name
+                      FROM abs_asset a, abs_assets_pakege p, abs_assets_pakege_msg msg, abs_enterprise ent
+                    WHERE a.id = msg.assets_id AND ent.id = a.ent_id AND msg.assets_package_id = p.id
+                      AND p.is_del = 0 AND p.id = #{assetPakegeId,jdbcType=INTEGER}
+                      <if test="null!= insId and ''!= insId " >
+                        AND p.institution_id = #{insId, jdbcType=INTEGER}
+                      </if>
+                   ) ass
+              LEFT JOIN abs_layer_assets_relevant r
+              ON ass.asset_id = r.asset_id AND r.asset_pakege_id = #{assetPakegeId,jdbcType=INTEGER} AND r.layer_id = #{layerId,jdbcType=INTEGER}
+            ) al
+    ORDER BY al.relevant_value
+  </select>
+
+  <insert id="insetList" parameterType="java.util.List">
+      insert into abs_layer_assets_relevant (id, layer_id, asset_pakege_id,
+        asset_id, relevant_value, creator_name,
+        create_time)
+    values
+      <foreach collection="list" item="r" separator=",">
+        (#{r.id,jdbcType=INTEGER}, #{r.layerId,jdbcType=INTEGER}, #{r.assetPakegeId,jdbcType=INTEGER},
+        #{r.assetId,jdbcType=INTEGER}, #{r.relevantValue,jdbcType=INTEGER}, #{r.creatorName,jdbcType=VARCHAR},
+        #{r.createTime,jdbcType=TIMESTAMP})
+      </foreach>
+  </insert>
+
+  <delete id="deleteByIdList" parameterType="java.util.List">
+     delete from abs_layer_assets_relevant
+       where id in
+     <foreach collection="list" item="id" open="(" separator="," close=")">
+       #{id, jdbcType=INTEGER}
+     </foreach>
+  </delete>
+
+  <select id="getListByLayerId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    SELECT <include refid="Base_Column_List" />
+      FROM abs_layer_assets_relevant
+    WHERE layer_id = #{0}
+  </select>
+
+  <delete id="deleteByLayerId" parameterType="java.lang.Integer">
+     delete from abs_layer_assets_relevant where layer_id = #{0}
+  </delete>
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.assetlayer.LayerResultMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.assetlayer.LayerResult" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="layer_id" property="layerId" jdbcType="INTEGER" />
+    <result column="level" property="level" jdbcType="VARCHAR" />
+    <result column="pay_date_str" property="payDateStr" jdbcType="VARCHAR" />
+    <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
+    <result column="proportion" property="proportion" jdbcType="DECIMAL" />
+    <result column="proportion_str" property="proportionStr" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, layer_id, level, pay_date, proportion
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_layer_result
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_layer_result
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.assetlayer.LayerResult" >
+    insert into abs_layer_result (id, layer_id, level, 
+      pay_date, proportion)
+    values (#{id,jdbcType=INTEGER}, #{layerId,jdbcType=INTEGER}, #{level,jdbcType=VARCHAR}, 
+      #{payDate,jdbcType=TIMESTAMP}, #{proportion,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ccx.credit.risk.model.assetlayer.LayerResult" >
+    insert into abs_layer_result
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="layerId != null" >
+        layer_id,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="payDate != null" >
+        pay_date,
+      </if>
+      <if test="proportion != null" >
+        proportion,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="layerId != null" >
+        #{layerId,jdbcType=INTEGER},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null" >
+        #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="proportion != null" >
+        #{proportion,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccx.credit.risk.model.assetlayer.LayerResult" >
+    update abs_layer_result
+    <set >
+      <if test="layerId != null" >
+        layer_id = #{layerId,jdbcType=INTEGER},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null" >
+        pay_date = #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="proportion != null" >
+        proportion = #{proportion,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.assetlayer.LayerResult" >
+    update abs_layer_result
+    set layer_id = #{layerId,jdbcType=INTEGER},
+      level = #{level,jdbcType=VARCHAR},
+      pay_date = #{payDate,jdbcType=TIMESTAMP},
+      proportion = #{proportion,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectListByLayerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT DATE_FORMAT(pay_date, '%Y-%m-%d') pay_date_str, GROUP_CONCAT(level) level, GROUP_CONCAT(proportion) proportion_str
+      FROM abs_layer_result where layer_id = #{0}
+    GROUP BY pay_date_str
+  </select>
+</mapper>

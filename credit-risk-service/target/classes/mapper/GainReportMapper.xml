@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.gainreport.GainReportMapper" >
+    <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.enterprise.Report" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="report_time" property="reportTime" jdbcType="VARCHAR" />
+        <result column="cal" property="cal" jdbcType="INTEGER" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+        <result column="cycle" property="cycle" jdbcType="INTEGER" />
+        <result column="is_audit" property="audit" jdbcType="INTEGER" />
+        <result column="currency" property="currency" jdbcType="INTEGER" />
+        <result column="audit_unit" property="auditUnit" jdbcType="VARCHAR" />
+        <result column="audit_opinion" property="auditOpinion" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="INTEGER" />
+        <result column="creator_name" property="creatorName" jdbcType="VARCHAR" />
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+        <result column="company_id" property="companyId" jdbcType="INTEGER" />
+        <result column="approval_status" property="approvalStatus" jdbcType="INTEGER" />
+    </resultMap>
+
+  <select id="getModleSheepList" resultType="java.util.Map" parameterType="java.lang.Integer">
+       SELECT
+        id,
+        name,
+        report_son_no,
+        columns_first_name
+    FROM
+        abs_enterprise_report_sheet where  report_type=#{typeId}
+  </select>
+  <select id="getModleFiledpList" resultType="java.util.Map" parameterType="java.lang.Integer">
+       SELECT
+        id,
+        report_son_type,
+        financial_subject,
+        column_excel,
+        order_no,
+        report_son_no,
+        required
+    FROM
+        abs_enterprise_report_model
+    WHERE
+        report_type = #{typeId}
+        ORDER BY
+	report_son_type ASC,
+	order_no ASC
+  </select>
+  <select id="getSheetMsgBysheetId" resultType="java.util.Map" parameterType="java.util.Map">
+       SELECT
+        id,
+        report_type,
+        name
+    FROM
+        abs_enterprise_report_sheet
+    WHERE
+      <choose>
+          <when test="id !=null and id != 0">
+              id = #{id}
+          </when>
+          <otherwise>
+              NAME = #{name}
+              AND report_type = #{typeId}
+          </otherwise>
+      </choose>
+     limit 1
+  </select>
+
+    <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        id, report_time, cal, type, cycle, is_audit, currency, audit_unit, audit_opinion, state
+    creator_name, create_date, update_date, company_id
+        from abs_enterprise_report
+        where is_delete_flag = 0
+        and id = #{reportId,jdbcType=INTEGER}
+    </select>
+
+    <select id="findReportSheetStatusByid"  resultType="java.util.Map" parameterType="java.lang.Integer" >
+         SELECT
+            t1.id,
+            t1.state,
+            report_son_type,
+            t2. name,
+            t2.sheet_order
+        FROM
+            abs_enterprise_report_state t1
+        JOIN abs_enterprise_report_sheet t2 ON t1.report_son_type = t2.id
+                WHERE
+                    t1.report_id = #{reportId} ORDER BY report_son_type asc
+    </select>
+    <select id="findValuesByreportid"  resultType="java.util.Map" parameterType="java.lang.Integer" >
+        SELECT
+            t1.id,
+            report_id,
+            report_model_id,
+            t2.report_son_type,
+            begin_balance,
+            end_balance,
+            begin_excel_name,
+            end_excel_name,
+            t2.financial_subject,
+            t2.column_excel,
+            t2.order_no,
+            t2.report_son_no,
+            t2.required
+        FROM
+            abs_enterprise_report_data_store t1
+        JOIN abs_enterprise_report_model t2 ON t1.report_model_id = t2.id
+        WHERE
+            report_id = #{reportId} ORDER BY report_model_id asc
+    </select>
+    <select id="findValuesByreportid"  resultType="java.util.Map" parameterType="java.lang.Integer" >
+        SELECT
+            t1.id,
+            report_id,
+            report_model_id,
+            t2.report_son_type,
+            begin_balance,
+            end_balance,
+            begin_excel_name,
+            end_excel_name,
+            t2.financial_subject,
+            t2.column_excel,
+            t2.order_no,
+            t2.report_son_no,
+            t2.required
+        FROM
+            abs_enterprise_report_data_store t1
+        JOIN abs_enterprise_report_model t2 ON t1.report_model_id = t2.id
+        WHERE
+            report_id = #{reportId} ORDER BY report_model_id asc
+    </select>
+    <select id="findFormulasBytypeId"  resultType="java.util.Map" parameterType="java.lang.Integer" >
+        SELECT
+            report_son_type,
+            model_id,
+            begin_formula,
+            end_formula
+        FROM
+            abs_enterprise_report_cloumns_formula
+        WHERE
+            report_type =#{typeId}
+    </select>
+</mapper>

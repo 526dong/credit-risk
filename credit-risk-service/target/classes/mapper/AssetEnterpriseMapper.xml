@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.asset.AssetEnterpriseMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.asset.AssetEnterprise" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="person_type" property="personType" jdbcType="VARCHAR" />
+    <result column="enterprise_name" property="enterpriseName" jdbcType="VARCHAR" />
+    <result column="is_afford_all_debt" property="affordAllDebt" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="asset_id" property="assetId" jdbcType="INTEGER" />
+    <result column="enterprise_id" property="enterpriseId" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, create_time, update_id, person_type, enterprise_name, is_afford_all_debt, type, 
+    asset_id, enterprise_id, company_id
+  </sql>
+  
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_asset_enterprise_relation
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="findEnterpriseByAssetId" resultMap="BaseResultMap" parameterType="java.util.Map">
+  	select <include refid="Base_Column_List" />
+  	from abs_asset_enterprise_relation
+  	where asset_id = #{assetId,jdbcType=INTEGER}
+  	and person_type = #{personType,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findByEnterpriseId" resultMap="BaseResultMap" parameterType="java.util.Map">
+  	select <include refid="Base_Column_List" />
+  	from abs_asset_enterprise_relation
+  	where asset_id = #{assetId,jdbcType=INTEGER}
+  	and enterprise_id = #{enterpriseId,jdbcType=INTEGER}
+  	and person_type = #{personType,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from abs_asset_enterprise_relation
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteEnterpriseByAssetId" parameterType="java.util.Map">
+  	delete from abs_asset_enterprise_relation 
+  	where asset_id = #{assetId,jdbcType=INTEGER}
+  	and person_type = #{personType,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.asset.AssetEnterprise" >
+    insert into abs_asset_enterprise_relation (create_time, update_id, 
+      person_type, enterprise_name, is_afford_all_debt, 
+      type, asset_id, enterprise_id, company_id)
+    values (#{createTime,jdbcType=TIMESTAMP}, #{updateId,jdbcType=INTEGER}, #{personType,jdbcType=VARCHAR},
+      #{enterpriseName,jdbcType=VARCHAR}, #{affordAllDebt,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
+      #{assetId,jdbcType=INTEGER}, #{enterpriseId,jdbcType=INTEGER}, #{companyId,jdbcType=INTEGER})
+  </insert>
+  
+  <insert id="batchInsertEnterprise" parameterType="java.util.List" >
+    insert into abs_asset_enterprise_relation (create_time, person_type, enterprise_name, is_afford_all_debt, type, 
+    	asset_id, enterprise_id, company_id) values 
+    <foreach collection ="list" item="bean" index= "index" separator =",">
+    (#{bean.createTime,jdbcType=TIMESTAMP}, #{bean.personType,jdbcType=VARCHAR}, #{bean.enterpriseName,jdbcType=VARCHAR},
+      #{bean.affordAllDebt,jdbcType=INTEGER}, #{bean.type,jdbcType=INTEGER},  #{bean.assetId,jdbcType=INTEGER},  
+      #{bean.enterpriseId,jdbcType=INTEGER}, #{bean.companyId,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+  
+  <update id="update" parameterType="com.ccx.credit.risk.model.asset.AssetEnterprise" >
+    update abs_asset_enterprise_relation
+    set create_time = #{createTime,jdbcType=TIMESTAMP},
+      person_type = #{personType,jdbcType=VARCHAR},
+      enterprise_name = #{enterpriseName,jdbcType=VARCHAR},
+      is_afford_all_debt = #{affordAllDebt,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      asset_id = #{assetId,jdbcType=INTEGER},
+      enterprise_id = #{enterpriseId,jdbcType=INTEGER},
+      company_id = #{companyId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByAsset" parameterType="com.ccx.credit.risk.model.asset.AssetEnterprise" >
+    update abs_asset_enterprise_relation
+    set create_time = #{createTime,jdbcType=TIMESTAMP},
+      enterprise_name = #{enterpriseName,jdbcType=VARCHAR},
+      is_afford_all_debt = #{affordAllDebt,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      company_id = #{companyId,jdbcType=INTEGER}
+    where asset_id = #{assetId,jdbcType=INTEGER}
+  	and enterprise_id = #{enterpriseId,jdbcType=INTEGER}
+  	and person_type = #{personType,jdbcType=VARCHAR}
+  </update>
+  
+</mapper>

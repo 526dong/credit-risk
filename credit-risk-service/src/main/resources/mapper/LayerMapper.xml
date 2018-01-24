@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.assetlayer.LayerMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.assetlayer.Layer" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="asset_pakege_id" property="assetPakegeId" jdbcType="INTEGER" />
+    <result column="layer_apply_num" property="layerApplyNum" jdbcType="VARCHAR" />
+    <result column="last_layer_user_name" property="lastLayerUserName" jdbcType="VARCHAR" />
+    <result column="last_layer_time" property="lastLayerTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+	
+    <result column="finish_flag" property="finishFlag" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, asset_pakege_id, layer_apply_num, last_layer_user_name, last_layer_time, status, finish_flag
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_layer
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_layer
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.assetlayer.Layer" useGeneratedKeys="true" keyProperty="id">
+    insert into abs_layer (id, asset_pakege_id, layer_apply_num, 
+      last_layer_user_name, last_layer_time, status, finish_flag
+      )
+    values (#{id,jdbcType=INTEGER}, #{assetPakegeId,jdbcType=INTEGER}, #{layerApplyNum,jdbcType=VARCHAR}, 
+      #{lastLayerUserName,jdbcType=VARCHAR}, #{lastLayerTime,jdbcType=TIMESTAMP}, #{status,jdbcType=TINYINT},
+      #{finishFlag,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ccx.credit.risk.model.assetlayer.Layer" >
+    insert into abs_layer
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="assetPakegeId != null" >
+        asset_pakege_id,
+      </if>
+      <if test="layerApplyNum != null" >
+        layer_apply_num,
+      </if>
+      <if test="lastLayerUserName != null" >
+        last_layer_user_name,
+      </if>
+      <if test="lastLayerTime != null" >
+        last_layer_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="finishFlag != null" >
+        finish_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="assetPakegeId != null" >
+        #{assetPakegeId,jdbcType=INTEGER},
+      </if>
+      <if test="layerApplyNum != null" >
+        #{layerApplyNum,jdbcType=VARCHAR},
+      </if>
+      <if test="lastLayerUserName != null" >
+        #{lastLayerUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="lastLayerTime != null" >
+        #{lastLayerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+ 	<if test="finishFlag != null" >
+        #{finishFlag,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccx.credit.risk.model.assetlayer.Layer" >
+    update abs_layer
+    <set >
+      <if test="assetPakegeId != null" >
+        asset_pakege_id = #{assetPakegeId,jdbcType=INTEGER},
+      </if>
+      <if test="layerApplyNum != null" >
+        layer_apply_num = #{layerApplyNum,jdbcType=VARCHAR},
+      </if>
+      <if test="lastLayerUserName != null" >
+        last_layer_user_name = #{lastLayerUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="lastLayerTime != null" >
+        last_layer_time = #{lastLayerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="finishFlag != null" >
+        finish_flag = #{finishFlag,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.assetlayer.Layer" >
+    update abs_layer
+    set asset_pakege_id = #{assetPakegeId,jdbcType=INTEGER},
+      layer_apply_num = #{layerApplyNum,jdbcType=VARCHAR},
+      last_layer_user_name = #{lastLayerUserName,jdbcType=VARCHAR},
+      last_layer_time = #{lastLayerTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=TINYINT},
+      finish_flag = #{finishFlag,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getPageList" parameterType="java.util.Map" resultType="com.ccx.credit.risk.model.assetlayer.Layer">
+    SELECT al.*
+      FROM (
+            SELECT package.*, MAX(ly.id) id, MAX(ly.last_layer_time) last_layer_time,  MAX(ly.layer_apply_num) layer_apply_num, IFNULL(ly.status,0) status
+              FROM (
+                    SELECT  p.id asset_pakege_id, p.asset_package_no, p.asset_package_name, COUNT(msg.id) asset_num
+                      FROM abs_assets_pakege p LEFT JOIN abs_assets_pakege_msg msg ON p.id = msg.assets_package_id WHERE p.is_del = 0
+                    <if test="null!= insId and ''!= insId " >
+                      AND p.institution_id = #{insId, jdbcType=INTEGER}
+                    </if>
+                    GROUP BY p.id
+                  ) package LEFT JOIN abs_layer ly ON package.asset_pakege_id = ly.asset_pakege_id WHERE TRUE
+              <if test="null != keyWord and '' != keyWord">
+                AND (package.asset_package_name like CONCAT('%', #{keyWord, jdbcType=VARCHAR} ,'%') OR package.asset_package_no like CONCAT('%', #{keyWord, jdbcType=VARCHAR}))
+              </if>
+              <if test="null != startDate and '' != startDate">
+                AND STR_TO_DATE(#{startDate, jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s') <![CDATA[<=]]> ly.last_layer_time
+              </if>
+              <if test="null != endDate and '' != endDate">
+                AND STR_TO_DATE(#{endDate, jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s') <![CDATA[>=]]> ly.last_layer_time
+              </if>
+            GROUP BY package.asset_pakege_id
+        ) al
+      <if test="null != status and '' != status">
+        WHERE al.status = #{status, jdbcType=INTEGER}
+      </if>
+  </select>
+
+  <select id="getLayerHistory" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" /> FROM abs_layer
+      WHERE asset_pakege_id = #{0} AND status = 1
+  </select>
+
+  <select id="findMaxDateByPackageId" resultType="java.util.Date" parameterType="java.lang.Integer">
+     SELECT MAX(repayment_date) FROM abs_assets_repayment WHERE assets_id IN
+          (SELECT assets_id FROM abs_assets_pakege_msg WHERE assets_package_id = #{0})
+  </select>
+
+  <select id="findMinDateByPackageId" resultType="java.util.Date" parameterType="java.lang.Integer">
+    SELECT MIN(put_date) FROM abs_asset WHERE id IN
+    (SELECT assets_id FROM abs_assets_pakege_msg WHERE assets_package_id = #{0})
+  </select>
+
+  <select id="getCapitalPricipal" parameterType="com.ccx.credit.risk.model.assetlayer.LayerSetup" resultType="java.util.Map">
+    SELECT SUM(repayment_amount) repaymentAmount, SUM(repayment_Interest) repaymentInterest, UNIX_TIMESTAMP(MAX(repayment_date)) repaymentDate
+      FROM abs_assets_repayment
+    WHERE assets_id IN (SELECT assets_id FROM abs_assets_pakege_msg WHERE assets_package_id = #{assetPakegeId})
+      AND repayment_date <![CDATA[>=]]> #{closePackageTime, jdbcType=TIMESTAMP}
+      AND repayment_date <![CDATA[<]]> DATE_ADD(#{predictExpireTime, jdbcType=TIMESTAMP}, INTERVAL 1 DAY)
+    GROUP BY assets_id
+  </select>
+</mapper>

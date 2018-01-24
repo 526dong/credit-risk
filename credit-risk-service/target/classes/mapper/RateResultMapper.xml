@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.rate.RateResultMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.rate.RateResult">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="rating_apply_num" property="ratingApplyNum" jdbcType="VARCHAR" />
+    <result column="ent_id" property="entId" jdbcType="INTEGER" />
+    <result column="element_name" property="elementName" jdbcType="VARCHAR" />
+    <result column="index_name" property="indexName" jdbcType="VARCHAR" />
+    <result column="index_data" property="indexData" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="INTEGER" />
+    <result column="degree" property="degree" jdbcType="VARCHAR" />
+    <result column="final_flag" property="finalFlag" jdbcType="VARCHAR" />
+    <result column="regular_index_flag" property="regularIndexFlag" jdbcType="VARCHAR" />
+    <result column="double_value" property="doubleValue" jdbcType="DOUBLE" />
+    <result column="weight" property="weight" jdbcType="DOUBLE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, rating_apply_num, ent_id,  element_name,  index_name, index_data,
+    value, degree, final_flag, regular_index_flag, double_value
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_rate_result
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_rate_result
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.ccx.credit.risk.mapper.rate.RateResultMapper" >
+    insert into abs_rate_result (id, rating_apply_num, ent_id,
+      element_name, index_name, index_data,
+      value, degree, final_flag,
+      regular_index_flag, double_value, weight
+      )
+    values (#{id,jdbcType=INTEGER}, #{ratingApplyNum,jdbcType=VARCHAR}, #{entId,jdbcType=INTEGER},
+      #{elementName,jdbcType=VARCHAR}, #{indexName,jdbcType=VARCHAR}, #{indexData,jdbcType=VARCHAR},
+      #{value,jdbcType=INTEGER}, #{degree,jdbcType=VARCHAR}, #{finalFlag,jdbcType=VARCHAR},
+      #{regularIndexFlag,jdbcType=VARCHAR}, #{doubleValue,jdbcType=DOUBLE}, #{weight,jdbcType=DOUBLE}
+      )
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.mapper.rate.RateResultMapper" >
+    update abs_rate_result
+    set rating_apply_num = #{ratingApplyNum,jdbcType=VARCHAR},
+    ent_id = #{entId,jdbcType=INTEGER},
+    element_name = #{elementName,jdbcType=VARCHAR},
+    index_name = #{indexName,jdbcType=VARCHAR},
+    index_data = #{indexData,jdbcType=VARCHAR},
+    value = #{value,jdbcType=INTEGER},
+    degree = #{degree,jdbcType=VARCHAR},
+    final_flag = #{finalFlag,jdbcType=VARCHAR},
+    regular_index_flag = #{regularIndexFlag,jdbcType=VARCHAR},
+    double_value = #{doubleValue,jdbcType=DOUBLE},
+    weight = #{weight,jdbcType=DOUBLE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--批量插入-->
+  <insert id="insertList" parameterType="java.util.List">
+    insert into abs_rate_result (id, rating_apply_num, ent_id,
+      element_name, index_name, index_data,
+      value, degree, final_flag,
+      regular_index_flag, double_value, weight
+    )
+    values
+      <foreach collection="list" item="item" separator=",">
+        (#{item.id,jdbcType=INTEGER}, #{item.ratingApplyNum,jdbcType=VARCHAR}, #{item.entId,jdbcType=INTEGER},
+        #{item.elementName,jdbcType=VARCHAR},#{item.indexName,jdbcType=VARCHAR}, #{item.indexData,jdbcType=VARCHAR}, #{item.value,jdbcType=INTEGER},
+        #{item.degree,jdbcType=VARCHAR}, #{item.finalFlag,jdbcType=VARCHAR}, #{item.regularIndexFlag,jdbcType=VARCHAR},
+        #{item.doubleValue,jdbcType=DOUBLE},#{item.weight,jdbcType=DOUBLE})
+      </foreach>
+  </insert>
+</mapper>

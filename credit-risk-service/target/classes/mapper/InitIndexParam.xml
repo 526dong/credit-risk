@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.init.InitIndexParamMapper">
+	
+	<resultMap id="IndustryIndexMap" type="com.ccx.credit.risk.model.index.IndustryIndex" >
+	    <id column="id" property="id" jdbcType="BIGINT" />
+	    <result column="industry_code" property="industryCode" jdbcType="VARCHAR" />
+	    <result column="industry_name" property="industryName" jdbcType="VARCHAR" />
+	    <result column="index_list" property="indexList" jdbcType="VARCHAR" />
+    </resultMap>
+	<select id="selectIndustryIndex"  parameterType="java.lang.Long" resultMap="IndustryIndexMap">
+		select id,industry_code,industry_name,index_list from abs_industry_index
+	</select>
+	
+	<resultMap id="IndexMap" type="com.ccx.credit.risk.model.index.IndexBean" >
+	    <id column="id" property="id" jdbcType="BIGINT" />
+	    <result column="index_id" property="indexId" jdbcType="VARCHAR" />
+	    <result column="index_name" property="indexName" jdbcType="VARCHAR" />
+	    <result column="equal_pick" property="equalPick" jdbcType="VARCHAR" />
+	    <result column="ave_years" property="aveYears" jdbcType="BIGINT" />
+	    <result column="regular_index_flag" property="regularIndexFlag" jdbcType="VARCHAR" />
+	    <result column="var_name" property="varName" jdbcType="VARCHAR" />
+	    <result column="index_weight" property="indexWeight" jdbcType="DOUBLE" />
+	    <result column="credit_flag" property="creditFlag" jdbcType="VARCHAR" />
+	    <result column="show_flag" property="showFlag" jdbcType="VARCHAR" />
+    </resultMap>
+	<select id="selectIndexData"  parameterType="java.lang.Long" resultMap="IndexMap">
+		select * from abs_index
+	</select>
+	
+	<resultMap id="IndexRule" type="com.ccx.credit.risk.model.index.IndexRule" >
+	    <id column="id" property="id" jdbcType="BIGINT" />
+	    <result column="index_id" property="indexId" jdbcType="VARCHAR" />
+	    <result column="index_name" property="indexName" jdbcType="VARCHAR" />
+	    <result column="value_id" property="valueId" jdbcType="VARCHAR" />
+	    <result column="value_min" property="valueMin" jdbcType="BIGINT" />
+	    <result column="value_max" property="valueMax" jdbcType="BIGINT" />
+	    <result column="value" property="value" jdbcType="VARCHAR" />
+	    <result column="degree" property="degree" jdbcType="VARCHAR" />
+    </resultMap>
+	<select id="selectIndexRule"  resultMap="IndexRule">
+		select * from abs_index_rule
+	</select>
+</mapper>

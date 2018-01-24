@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.index.IndexRuleMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.index.IndexRule" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="value_min" property="valueMin" jdbcType="DOUBLE" />
+    <result column="value_max" property="valueMax" jdbcType="DOUBLE" />
+    <result column="value" property="value" jdbcType="VARCHAR" />
+    <result column="score" property="score" jdbcType="INTEGER" />
+    <result column="degree" property="degree" jdbcType="VARCHAR" />
+    <result column="index_id" property="indexId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, value_min, value_max, value, score, degree, index_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from abs_index_rule
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--通过答案获取定性指标的分值-->
+  <select id="getScoreByAns" resultType="java.lang.Integer">
+    SELECT score FROM abs_index_rule WHERE index_id = #{indexId, jdbcType=INTEGER} AND value = #{answer, jdbcType=VARCHAR}
+  </select>
+
+  <!--通过答案获取定量指标的分值-->
+  <select id="getByRangeAns" resultMap="BaseResultMap">
+    SELECT score,degree FROM abs_index_rule WHERE index_id = #{indexId, jdbcType=INTEGER}
+     AND(
+        (#{answer, jdbcType=DOUBLE} <![CDATA[>=]]> value_min AND #{answer, jdbcType=DOUBLE} <![CDATA[<]]> value_max) OR
+        (#{answer, jdbcType=DOUBLE} <![CDATA[<]]> value_max AND value_min IS NULL) OR
+        (#{answer, jdbcType=DOUBLE} <![CDATA[>=]]> value_min AND value_max IS NULL)
+     )
+</select>
+</mapper>

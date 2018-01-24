@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.index.IndexFormulaMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.index.IndexFormula" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="formula_id" property="formulaId" jdbcType="VARCHAR" />
+    <result column="formula_name" property="formulaName" jdbcType="VARCHAR" />
+    <result column="formula_content" property="formulaContent" jdbcType="VARCHAR" />
+    <result column="year" property="year" jdbcType="INTEGER" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="parent_flag" property="parentFlag" jdbcType="INTEGER" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="year_len" property="yearLen" jdbcType="INTEGER" />
+    <!--<collection property="formulaList" select="getListByParentId" column="{parentId=id}" />-->
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, formula_id, formula_name, formula_content, year, parent_id, parent_flag, creator, 
+    create_time, year_len
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_index_formula
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--获取无分页列表-->
+  <select id="findFormulaList" resultMap="BaseResultMap">
+    SELECT * FROM abs_index_formula
+  </select>
+
+  <!--获取带分页list-->
+  <select id="getPageList" resultMap="BaseResultMap">
+    select formula_name, formula_content, year, year_len
+      from abs_index_formula
+    <!--where TRUE
+    <if test="null != parentFlag">
+      AND parent_flag = #{parentFlag,jdbcType=INTEGER}
+    </if>
+    <if test="null != name">
+     AND formula_name like #{name,jdbcType=VARCHAR}
+    </if>-->
+  </select>
+
+  <!--通过父id和年份查询公式-->
+  <select id="getByParentIdAndYear" resultType="java.lang.String">
+    SELECT formula_content FROM abs_index_formula
+      WHERE parent_id = (SELECT id FROM abs_index_formula WHERE id = #{formulaId, jdbcType=VARCHAR})
+      AND year = #{len,jdbcType=INTEGER}
+  </select>
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.enterprise.EnterpriseReportSheetMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.enterprise.EnterpriseReportSheet" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="column_id" property="columnId" jdbcType="VARCHAR" />
+    <result column="report_type" property="reportType" jdbcType="INTEGER" />
+    <result column="report_son_no" property="reportSonNo" jdbcType="TINYINT" />
+    <result column="columns_first_name" property="columnsFirstName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, column_id, report_type, report_son_no, columns_first_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM abs_enterprise_report_sheet
+    WHERE id = #{id,jdbcType=INTEGER}
+  </select>
+  <!-- 通过报表类型查询报表子表概况信息 -->
+  <select id="selectByReportType" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM abs_enterprise_report_sheet
+    WHERE report_type = #{0}
+  </select>
+  <!-- 通过报表类型、子表名称查询报表子表概况信息 -->
+  <select id="selectByReportSonName" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM abs_enterprise_report_sheet
+    WHERE report_type = #{reportType,jdbcType=INTEGER}
+    AND NAME = #{reportSonName,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    DELETE FROM abs_enterprise_report_sheet
+    WHERE id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportSheet" >
+    INSERT INTO abs_enterprise_report_sheet (name, column_id, report_type,
+      report_son_no, columns_first_name)
+    VALUES (#{name,jdbcType=VARCHAR}, #{columnId,jdbcType=VARCHAR}, #{reportType,jdbcType=INTEGER},
+      #{reportSonNo,jdbcType=TINYINT}, #{columnsFirstName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportSheet" >
+    insert into abs_enterprise_report_sheet
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="columnId != null" >
+        columnId,
+      </if>
+      <if test="reportType != null" >
+        report_type,
+      </if>
+      <if test="reportSonNo != null" >
+        report_son_no,
+      </if>
+      <if test="columnsFirstName != null" >
+        columns_first_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="columnId != null" >
+        #{columnId,jdbcType=VARCHAR},
+      </if>
+      <if test="reportType != null" >
+        #{reportType,jdbcType=INTEGER},
+      </if>
+      <if test="reportSonNo != null" >
+        #{reportSonNo,jdbcType=TINYINT},
+      </if>
+      <if test="columnsFirstName != null" >
+        #{columnsFirstName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportSheet" >
+    update abs_enterprise_report_sheet
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="columnId != null" >
+        column_id = #{columnId,jdbcType=VARCHAR},
+      </if>
+      <if test="reportType != null" >
+        report_type = #{reportType,jdbcType=INTEGER},
+      </if>
+      <if test="reportSonNo != null" >
+        report_son_no = #{reportSonNo,jdbcType=TINYINT},
+      </if>
+      <if test="columnsFirstName != null" >
+        columns_first_name = #{columnsFirstName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportSheet" >
+    update abs_enterprise_report_sheet
+    set name = #{name,jdbcType=VARCHAR},
+      column_id = #{columnId,jdbcType=VARCHAR},
+      report_type = #{reportType,jdbcType=INTEGER},
+      report_son_no = #{reportSonNo,jdbcType=TINYINT},
+      columns_first_name = #{columnsFirstName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

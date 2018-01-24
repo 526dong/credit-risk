@@ -1,0 +1,162 @@
+package com.ccx.credit.risk.main;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.ccx.credit.risk.util.Record;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.ccx.credit.risk.api.ResourceApi;
+import com.ccx.credit.risk.base.BasicController;
+import com.ccx.credit.risk.model.PermissionBean;
+import com.ccx.credit.risk.model.User;
+
+
+/**
+ * 
+ * @description 资源管理:resource
+ * @author zxr
+ * @date 2017 下午2:18:41
+ */
+@Controller
+@RequestMapping("/resource")
+public class ResourceController extends BasicController{
+	@Autowired
+	private ResourceApi resourceApi;
+    
+	/**
+     * 资源管理页
+     *
+     * @return
+     */
+    @GetMapping("/manager")
+	@Record(operationType="跳转资源管理页面",
+			operationBasicModule="系统管理",
+			operationConcreteModule ="权限管理")
+    public String manager() {
+        return "/resource/permissionList";
+    }
+	
+    /**
+     * 
+     * @Title: permissionListPage  
+     * @author: WXN
+     * @Description: 获取权限列表(这里用一句话描述这个方法的作用)   
+     * @param: @param request
+     * @param: @param response
+     * @param: @return      
+     * @return: String      
+     * @throws
+     */
+    @RequestMapping(value="/permissionListPage",method=RequestMethod.POST,produces = "application/json; charset=utf-8")
+	public @ResponseBody String permissionListPage(HttpServletRequest request,
+			HttpServletResponse response){
+		String s =resourceApi.findAllPermission();
+		System.err.println(s);
+		return s;
+	}
+    
+    /**
+     * 
+     * @Title: addpermission  
+     * @author: WXN
+     * @Description: 添加权限(这里用一句话描述这个方法的作用)   
+     * @param: @param permissionBean
+     * @param: @param request
+     * @param: @param response
+     * @param: @return      
+     * @return: String      
+     * @throws
+     */
+    @RequestMapping(value="/addpermission")
+	public @ResponseBody String addpermission(@ModelAttribute PermissionBean permissionBean,HttpServletRequest request,
+			HttpServletResponse response){
+		User user = (User)request.getSession().getAttribute("zxuser");
+		//添加创建人
+		if (null != user) {
+			permissionBean.setCreater(user.getLoginName());
+		}
+		//添加创建时间
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		String creattime = df.format(new Date());// new Date()为获取当前系统时间
+		permissionBean.setCreateTime(creattime);
+		//添加权限状态
+		permissionBean.setPermission_state(1);
+		
+		System.out.println(permissionBean);
+		String s = resourceApi.addPermissions(permissionBean);
+		System.out.println(s);
+		return JSON.toJSONString(s);
+	}
+    
+    /**
+     * 
+     * @Title: saveEditPermission  
+     * @author: WXN
+     * @Description: 编辑权限(这里用一句话描述这个方法的作用)   
+     * @param: @param permissionBean
+     * @param: @param request
+     * @param: @param response
+     * @param: @return      
+     * @return: String      
+     * @throws
+     */
+    @RequestMapping(value="/saveEditPermission")
+	public @ResponseBody String saveEditPermission(@ModelAttribute PermissionBean permissionBean,HttpServletRequest request,
+			HttpServletResponse response){
+		User user = (User)request.getSession().getAttribute("zxuser");
+		//添加修改人
+		if (null != user) {
+			permissionBean.setModifier(user.getLoginName());
+		}
+		//添加修改时间
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		String creattime = df.format(new Date());// new Date()为获取当前系统时间
+		permissionBean.setModifyTime(creattime);
+		permissionBean.setPermission_state(1);
+		System.out.println(permissionBean);
+		String s = resourceApi.modifypermission(permissionBean);
+		System.out.println(s);
+		return JSON.toJSONString(s);
+	}
+    
+    /**
+     * 
+     * @Title: modifypermissionState  
+     * @author: WXN
+     * @Description: 删除权限（更改权限状态）(这里用一句话描述这个方法的作用)   
+     * @param: @param permissionBean
+     * @param: @param request
+     * @param: @param response
+     * @param: @return      
+     * @return: String      
+     * @throws
+     */
+    @RequestMapping(value="/modifypermissionState")
+	public @ResponseBody String modifypermissionState(@ModelAttribute PermissionBean permissionBean,HttpServletRequest request,
+			HttpServletResponse response){
+    	User user = (User)request.getSession().getAttribute("zxuser");
+		//添加修改人
+		if (null != user) {
+			permissionBean.setModifier(user.getLoginName());
+		}
+		//添加修改时间
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		String creattime = df.format(new Date());// new Date()为获取当前系统时间
+		permissionBean.setModifyTime(creattime);
+		String s = resourceApi.modifypermissionState(permissionBean);
+		System.out.println(s);
+		return JSON.toJSONString(s);
+	}
+
+}

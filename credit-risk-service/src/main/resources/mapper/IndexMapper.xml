@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.index.IndexMapper">
+
+	<resultMap id="IndexMap" type="com.ccx.credit.risk.model.index.IndexBean">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="index_code" property="indexCode" jdbcType="VARCHAR" />
+		<result column="index_name" property="indexName" jdbcType="VARCHAR" />
+		<result column="equal_pick" property="equalPick" jdbcType="VARCHAR" />
+		<result column="ave_years" property="aveYears" jdbcType="INTEGER" />
+		<result column="regular_index_flag" property="regularIndexFlag" jdbcType="VARCHAR" />
+		<result column="var_name" property="varName" jdbcType="VARCHAR" />
+		<result column="index_weight" property="indexWeight" jdbcType="DOUBLE" />
+		<result column="credit_flag" property="creditFlag" jdbcType="VARCHAR" />
+		<result column="state" property="state" jdbcType="VARCHAR" />
+		<result column="element_id" property="elementId" jdbcType="INTEGER" />
+		<result column="formula_id" property="formulaId" jdbcType="INTEGER" />
+		<result column="formula_name" property="formulaName" jdbcType="VARCHAR" />
+		<result column="index_en_name" property="indexEnName" jdbcType="VARCHAR" />
+		<result column="index_describe" property="indexDescribe" jdbcType="VARCHAR" />
+		<collection property="ruleList" javaType="ArrayList" select="findRuleByIndexId" column="{index_id=id}"/>
+	</resultMap>
+
+	<!-- abs_index_rule -->
+	<resultMap id="IndexRuleMap" type="com.ccx.credit.risk.model.index.IndexRule" >
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="value_min" property="valueMin" jdbcType="DOUBLE" />
+		<result column="value_max" property="valueMax" jdbcType="DOUBLE" />
+		<result column="value" property="value" jdbcType="VARCHAR" />
+		<result column="score" property="score" jdbcType="INTEGER" />
+		<result column="degree" property="degree" jdbcType="VARCHAR" />
+		<result column="index_id" property="indexId" jdbcType="INTEGER" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+    </resultMap>
+
+	<select id="findAllIndex" resultMap="IndexMap">
+		select *
+		from abs_index
+	</select>
+
+	<!--查所有定性-->
+	<select id="findNatureIndexByElementIds" resultMap="IndexMap" parameterType="java.util.List">
+		select * from abs_index
+		where regular_index_flag = '1' and state = 1 and element_id in
+			<foreach item="ids" collection="list" open="(" separator="," close=")">  
+		 		#{ids,jdbcType=INTEGER}  
+			</foreach>	 
+	</select>
+
+	<!--通过因素id查指标-->
+	<select id="findIndexByElementId" parameterType="java.lang.Integer" resultMap="IndexMap">
+		select * from abs_index
+		where state = 1 and element_id = #{0}
+	</select>
+
+	<!--通过因素id查指标-->
+	<select id="findIndexWithoutRuleByElementId" parameterType="java.lang.Integer" resultType="com.ccx.credit.risk.model.index.IndexBean">
+		select id, index_name as indexName, ave_years as aveYears, regular_index_flag as regularIndexFlag, index_weight as indexWeight, formula_id as formulaId
+			from abs_index
+		where state = 1 and element_id = #{0}
+	</select>
+
+	<!--通过因素id查定性指标-->
+	<select id="findNatureIndexWithoutRuleByElementId" parameterType="java.lang.Integer" resultType="com.ccx.credit.risk.model.index.IndexBean">
+		select id, index_name as indexName, ave_years as aveYears, regular_index_flag as regularIndexFlag, index_weight as indexWeight, formula_id as formulaId
+		from abs_index
+		where state = 1 and element_id = #{0} and regular_index_flag = 1
+	</select>
+	
+	<!--查所有指标-->
+	<select id="findAllIndexByElementIds" resultMap="IndexMap" parameterType="java.util.List">
+		/*评级按需加载*/
+		select id, index_name, ave_year, regular_index_flag, index_weight, element_id, formula_id
+			from abs_index
+		where state = 1 and element_id in
+		<foreach item="ids" collection="list" open="(" separator="," close=")">
+			#{ids,jdbcType=INTEGER}
+		</foreach>
+	</select>
+
+	<select id="findRuleByIndexId" resultMap="IndexRuleMap" parameterType="map">
+		select * from abs_index_rule where index_id = #{index_id}
+	</select>
+
+	<!-- xzd add -->
+	<!--主体相关，增加主体和指标的关系-->
+	<insert id="batchInsertIndex" parameterType="java.util.List" >
+    insert into abs_enterprise_index_relation (enterprise_id, index_id, index_name, index_data, 
+    	rule_id, company_id) values 
+    <foreach collection ="list" item="bean" index= "index" separator =",">
+    (#{bean.enterpriseId,jdbcType=INTEGER}, #{bean.indexId,jdbcType=INTEGER}, 
+      #{bean.indexName,jdbcType=VARCHAR}, #{bean.indexData,jdbcType=VARCHAR},  
+      #{bean.ruleId,jdbcType=INTEGER}, #{bean.companyId,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+  
+  <delete id="deleteIndexRelation" parameterType="java.lang.Integer">
+  	delete from abs_enterprise_index_relation where enterprise_id = #{enterpriseId,jdbcType=INTEGER}
+  </delete>
+	<!-- xzd add end -->
+
+	<!--根据指标id和规则id查询指标和对应的值，用于评级报告查看-->
+	<select id="findIndexAndRule" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT i.id AS id, i.index_name AS indexName, r.value AS ruleValue FROM abs_index i,abs_index_rule r WHERE
+			i.id = r.index_id AND
+			<foreach collection="list" item="param" open="(" close=")" separator="OR">
+				(i.id=#{param.indexId, jdbcType=INTEGER} AND r.id = #{param.ruleId, jdbcType=INTEGER})
+			</foreach>
+	</select>
+</mapper>

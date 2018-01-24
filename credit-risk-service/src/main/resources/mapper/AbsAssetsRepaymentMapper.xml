@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.asset.AbsAssetsRepaymentMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.asset.AbsAssetsRepayment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="assets_id" property="assetsId" jdbcType="INTEGER" />
+    <result column="repayment_date" property="repaymentDate" jdbcType="TIMESTAMP" />
+    <result column="repayment_amount" property="repaymentAmount" jdbcType="DECIMAL" />
+    <result column="repayment_Interest" property="repaymentInterest" jdbcType="DECIMAL" />
+    <result column="repayment_cost" property="repaymentCost" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, assets_id, repayment_date, repayment_amount, repayment_Interest, repayment_cost
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_assets_repayment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--通过资产id查询现金流-->
+  <select id="findCashFlowByAssetId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List" />
+    from abs_assets_repayment
+    where assets_id = #{assetId,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_assets_repayment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <!--通过资产id删除现金流信息-->
+  <delete id="deleteByAssetId" parameterType="java.lang.Integer" >
+    delete from abs_assets_repayment
+    where assets_id = #{assetId,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.asset.AbsAssetsRepayment" >
+    insert into abs_assets_repayment (assets_id, repayment_date,
+      repayment_amount, repayment_Interest, repayment_cost)
+    values (#{assetsId,jdbcType=INTEGER}, #{repaymentDate,jdbcType=TIMESTAMP},
+      #{repaymentAmount,jdbcType=DECIMAL}, #{repaymentInterest,jdbcType=DECIMAL}, #{repaymentCost,jdbcType=DECIMAL})
+  </insert>
+
+  <!--批量插入-->
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into abs_assets_repayment (assets_id, repayment_date,
+      repayment_amount, repayment_Interest, repayment_cost) values
+    <foreach collection="list" item="bean" index="index" separator=",">
+      (#{bean.assetsId,jdbcType=INTEGER}, #{bean.repaymentDate,jdbcType=TIMESTAMP}, #{bean.repaymentAmount,jdbcType=DECIMAL},
+      #{bean.repaymentInterest,jdbcType=DECIMAL}, #{bean.repaymentCost,jdbcType=DECIMAL})
+    </foreach>
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.asset.AbsAssetsRepayment" >
+    update abs_assets_repayment
+    set assets_id = #{assetsId,jdbcType=INTEGER},
+      repayment_date = #{repaymentDate,jdbcType=TIMESTAMP},
+      repayment_amount = #{repaymentAmount,jdbcType=DECIMAL},
+      repayment_Interest = #{repaymentInterest,jdbcType=DECIMAL},
+      repayment_cost = #{repaymentCost,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

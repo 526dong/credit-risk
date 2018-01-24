@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.asset.AssetMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.asset.Asset" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="apply_code" property="applyCode" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="creator_name" property="creatorName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="update_id" property="updateId" jdbcType="INTEGER" />
+    <result column="enterprise_id" property="enterpriseId" jdbcType="INTEGER" />
+      <result column="is_delete_flag" property="deleteFlag" jdbcType="INTEGER" />
+      <association select="findEnterpriseNames" property="enterpriseInfo" column="{asset_id=id}"></association>
+  </resultMap>
+
+    <resultMap id="UserResultMap" type="com.ccx.credit.risk.model.User" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="login_name" property="loginName" jdbcType="VARCHAR" />
+    </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, apply_code, code, name, type, creator_name, create_date, update_date, update_id, enterprise_id, company_id, is_delete_flag
+  </sql>
+  
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_asset
+    where is_delete_flag = 0
+      AND id = #{id,jdbcType=INTEGER}
+  </select>
+
+    <select id="findByName" resultType="java.lang.Integer" parameterType="java.lang.String" >
+        select
+        count(*)
+        from abs_asset
+        where is_delete_flag = 0
+      AND name = #{name,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findByCode" resultType="java.lang.Integer" parameterType="java.lang.String" >
+        select
+        count(*)
+        from abs_asset
+        where is_delete_flag = 0
+      AND code = #{code,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findByApplyCode" resultType="java.lang.Integer" parameterType="java.lang.String" >
+        select
+        count(*)
+        from abs_asset
+        where is_delete_flag = 0
+      AND apply_code = #{applyCode,jdbcType=VARCHAR}
+    </select>
+  
+  <select id="findAllAsset" resultMap="BaseResultMap">
+  	select
+  		<include refid="Base_Column_List" />
+  	from abs_asset
+      WHERE is_delete_flag = 0
+  	order by id
+  </select>
+  
+  <select id="findAll" resultMap="BaseResultMap" parameterType="java.util.Map">
+  	select
+  		<include refid="Base_Column_List" />
+  	from abs_asset
+  		<where>
+            is_delete_flag = 0
+		   	<if test="null!=founderFind and ''!=founderFind" > and creator_name = #{founderFind} </if>
+		   	<if test="null!=keyWord and ''!=keyWord" > 
+		   		and (code like concat('%', #{keyWord},'%') or name like concat('%',#{keyWord},'%'))
+		   	</if>
+  		</where>
+  	order by create_date DESC
+  </select>
+    <!--创建人-->
+    <select id="findAllUser" resultMap="UserResultMap">
+        select id, login_name, name
+        from abs_user_fg
+        order by id
+    </select>
+
+    <select id="findByIdList" parameterType="java.util.List" resultType="java.util.Map">
+        SELECT a.code, a.name, DATE_FORMAT(a.create_date, '%Y-%m-%d')  createDate, a.creator_name creator, ent.name enterpriseName
+          FROM abs_asset a, abs_enterprise ent
+        WHERE a.enterprise_id = ent.id AND a.id IN
+          <foreach collection="list" open="(" separator="," close=")" item="id">
+              #{id}
+          </foreach>
+    </select>
+
+    <select id="findEnterpriseNames" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT GROUP_CONCAT(enterprise_id) AS enterpriseIds, GROUP_CONCAT(enterprise_name) AS enterpriseNames FROM abs_asset_enterprise_relation WHERE asset_id = #{asset_id}
+    </select>
+  
+  <!--<delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from abs_asset
+    where id = #{id,jdbcType=INTEGER}
+  </delete>-->
+    <!--逻辑删除资产-->
+    <update id="deleteById" parameterType="java.lang.Integer">
+      update abs_asset set is_delete_flag = 1
+      where id = #{id,jdbcType=INTEGER}
+    </update>
+  
+  <delete id="deleteEnterpriseByAssetId" parameterType="java.util.Map">
+  	delete from abs_asset_enterprise_relation 
+  	where asset_id = #{assetId,jdbcType=INTEGER}
+  	and person_type = #{personType,jdbcType=INTEGER}
+  </delete>
+
+    <!--通过资产id删除资产包关联信息-->
+    <delete id="deleteAssetPackageAssetId" parameterType="java.lang.Integer">
+        delete from abs_assets_pakege_msg
+        where assets_id = #{id,jdbcType=INTEGER}
+    </delete>
+
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.asset.Asset" >
+    insert into abs_asset (apply_code, code, name, type, creator_name, create_date, update_date, 
+    	update_id, enterprise_id, company_id)
+    values (#{applyCode,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER},
+      #{creatorName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{updateId,jdbcType=INTEGER}, #{enterpriseId,jdbcType=INTEGER}, #{companyId,jdbcType=INTEGER})
+  </insert>
+  
+  <update id="update" parameterType="com.ccx.credit.risk.model.asset.Asset" >
+    update abs_asset
+    set name = #{name,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--
+        apply_code = #{applyCode,jdbcType=VARCHAR},
+        code = #{code,jdbcType=VARCHAR},
+        type = #{type,jdbcType=INTEGER},
+        creator_name = #{creatorName,jdbcType=VARCHAR},
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+        update_id = #{updateId,jdbcType=INTEGER},
+        enterprise_id = #{enterpriseId,jdbcType=INTEGER},
+        company_id = #{companyId,jdbcType=INTEGER}
+  -->
+</mapper>

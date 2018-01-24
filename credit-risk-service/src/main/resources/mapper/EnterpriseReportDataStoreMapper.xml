@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.enterprise.EnterpriseReportDataStoreMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.enterprise.EnterpriseReportDataStore" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="report_id" property="reportId" jdbcType="INTEGER" />
+    <result column="report_model_id" property="reportModelId" jdbcType="INTEGER" />
+    <result column="begin_balance" property="beginBalance" jdbcType="DECIMAL" />
+    <result column="end_balance" property="endBalance" jdbcType="DECIMAL" />
+    <result column="begin_excel_name" property="beginExcelName" jdbcType="VARCHAR" />
+    <result column="end_excel_name" property="endExcelName" jdbcType="VARCHAR" />
+    <result column="creator_name" property="creatorName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <!--是否删除标识-->
+    <result column="is_delete_flag" property="deleteFlag" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, report_id, report_model_id, begin_balance, end_balance, begin_excel_name, end_excel_name, 
+    creator_name, create_date, update_date, company_id, is_delete_flag
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_enterprise_report_data_store
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--通过reportType查询子表数据-->
+  <select id="findByReportId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from abs_enterprise_report_data_store
+    where report_id = #{0,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_enterprise_report_data_store
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportDataStore" >
+    insert into abs_enterprise_report_data_store (id, report_id, report_model_id, 
+      begin_balance, end_balance, begin_excel_name, 
+      end_excel_name, creator_name, create_date, 
+      update_date, company_id)
+    values (#{id,jdbcType=INTEGER}, #{reportId,jdbcType=INTEGER}, #{reportModelId,jdbcType=INTEGER}, 
+      #{beginBalance,jdbcType=DECIMAL}, #{endBalance,jdbcType=DECIMAL}, #{beginExcelName,jdbcType=VARCHAR}, 
+      #{endExcelName,jdbcType=VARCHAR}, #{creatorName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{companyId,jdbcType=INTEGER})
+  </insert>
+
+  <!--批量插入报表数据-->
+  <insert id="batchInsert" parameterType="java.util.List" >
+    insert into abs_enterprise_report_data_store
+      (report_id, report_model_id, begin_balance, end_balance,
+      begin_excel_name, end_excel_name, creator_name, create_date, update_date, company_id)
+    values
+    <foreach collection="list" item="bean" index="index" separator=",">
+      (#{bean.reportId,jdbcType=INTEGER}, #{bean.reportModelId,jdbcType=VARCHAR},
+      #{bean.beginBalance,jdbcType=DECIMAL}, #{bean.endBalance,jdbcType=DECIMAL},
+      #{bean.beginExcelName,jdbcType=VARCHAR}, #{bean.endExcelName,jdbcType=VARCHAR},
+      #{bean.creatorName,jdbcType=VARCHAR},#{bean.createDate,jdbcType=TIMESTAMP},
+      #{bean.updateDate,jdbcType=TIMESTAMP}, #{bean.companyId,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+
+  <!--将状态置为不可用-即已经删除状态-->
+  <update id="updateDeleteFlagById" parameterType="java.lang.Integer" >
+    update abs_enterprise_report_data_store
+    set is_delete_flag = 1
+    where id = #{0,jdbcType=INTEGER}
+  </update>
+</mapper>

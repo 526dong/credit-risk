@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.assetlayer.LayerAssetLevelMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.assetlayer.LayerAssetLevel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="level_id" property="levelId" jdbcType="CHAR" />
+    <result column="layer_id" property="layerId" jdbcType="INTEGER" />
+    <result column="layer_name" property="layerName" jdbcType="VARCHAR" />
+    <result column="security_type" property="securityType" jdbcType="TINYINT" />
+    <result column="capital_rate" property="capitalRate" jdbcType="DECIMAL" />
+    <result column="expect_earnings_rate" property="expectEarningsRate" jdbcType="DECIMAL" />
+    <result column="is_float" property="isFloat" jdbcType="TINYINT" />
+    <result column="layer_result_level" property="layerResultLevel" jdbcType="VARCHAR" />
+    <result column="issue_period" property="issuePeriod" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, level_id, layer_id, layer_name, security_type, capital_rate, expect_earnings_rate, 
+    is_float, layer_result_level, issue_period
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_assets_layer_level
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_assets_layer_level
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.assetlayer.LayerAssetLevel" >
+    insert into abs_assets_layer_level (id, level_id, layer_id, 
+      layer_name, security_type, capital_rate, 
+      expect_earnings_rate, is_float, layer_result_level, 
+      issue_period)
+    values (#{id,jdbcType=INTEGER}, #{levelId,jdbcType=CHAR}, #{layerId,jdbcType=INTEGER}, 
+      #{layerName,jdbcType=VARCHAR}, #{securityType,jdbcType=TINYINT}, #{capitalRate,jdbcType=DECIMAL}, 
+      #{expectEarningsRate,jdbcType=DECIMAL}, #{isFloat,jdbcType=TINYINT}, #{layerResultLevel,jdbcType=VARCHAR}, 
+      #{issuePeriod,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ccx.credit.risk.model.assetlayer.LayerAssetLevel" >
+    insert into abs_assets_layer_level
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="levelId != null" >
+        level_id,
+      </if>
+      <if test="layerId != null" >
+        layer_id,
+      </if>
+      <if test="layerName != null" >
+        layer_name,
+      </if>
+      <if test="securityType != null" >
+        security_type,
+      </if>
+      <if test="capitalRate != null" >
+        capital_rate,
+      </if>
+      <if test="expectEarningsRate != null" >
+        expect_earnings_rate,
+      </if>
+      <if test="isFloat != null" >
+        is_float,
+      </if>
+      <if test="layerResultLevel != null" >
+        layer_result_level,
+      </if>
+      <if test="issuePeriod != null" >
+        issue_period,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="levelId != null" >
+        #{levelId,jdbcType=CHAR},
+      </if>
+      <if test="layerId != null" >
+        #{layerId,jdbcType=INTEGER},
+      </if>
+      <if test="layerName != null" >
+        #{layerName,jdbcType=VARCHAR},
+      </if>
+      <if test="securityType != null" >
+        #{securityType,jdbcType=TINYINT},
+      </if>
+      <if test="capitalRate != null" >
+        #{capitalRate,jdbcType=DECIMAL},
+      </if>
+      <if test="expectEarningsRate != null" >
+        #{expectEarningsRate,jdbcType=DECIMAL},
+      </if>
+      <if test="isFloat != null" >
+        #{isFloat,jdbcType=TINYINT},
+      </if>
+      <if test="layerResultLevel != null" >
+        #{layerResultLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="issuePeriod != null" >
+        #{issuePeriod,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccx.credit.risk.model.assetlayer.LayerAssetLevel" >
+    update abs_assets_layer_level
+    <set >
+      <if test="levelId != null" >
+        level_id = #{levelId,jdbcType=CHAR},
+      </if>
+      <if test="layerId != null" >
+        layer_id = #{layerId,jdbcType=INTEGER},
+      </if>
+      <if test="layerName != null" >
+        layer_name = #{layerName,jdbcType=VARCHAR},
+      </if>
+      <if test="securityType != null" >
+        security_type = #{securityType,jdbcType=TINYINT},
+      </if>
+      <if test="capitalRate != null" >
+        capital_rate = #{capitalRate,jdbcType=DECIMAL},
+      </if>
+      <if test="expectEarningsRate != null" >
+        expect_earnings_rate = #{expectEarningsRate,jdbcType=DECIMAL},
+      </if>
+      <if test="isFloat != null" >
+        is_float = #{isFloat,jdbcType=TINYINT},
+      </if>
+      <if test="layerResultLevel != null" >
+        layer_result_level = #{layerResultLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="issuePeriod != null" >
+        issue_period = #{issuePeriod,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.assetlayer.LayerAssetLevel" >
+    update abs_assets_layer_level
+    set level_id = #{levelId,jdbcType=CHAR},
+      layer_id = #{layerId,jdbcType=INTEGER},
+      layer_name = #{layerName,jdbcType=VARCHAR},
+      security_type = #{securityType,jdbcType=TINYINT},
+      capital_rate = #{capitalRate,jdbcType=DECIMAL},
+      expect_earnings_rate = #{expectEarningsRate,jdbcType=DECIMAL},
+      is_float = #{isFloat,jdbcType=TINYINT},
+      layer_result_level = #{layerResultLevel,jdbcType=VARCHAR},
+      issue_period = #{issuePeriod,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <delete id="deleteByLayerId" parameterType="java.lang.Integer">
+    DELETE FROM abs_assets_layer_level WHERE layer_id = #{0}
+  </delete>
+
+  <select id="getListByLayerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+      from abs_assets_layer_level
+    where layer_id = #{0}
+  </select>
+
+  <insert id="insertList" parameterType="java.util.List">
+     insert into abs_assets_layer_level (id, level_id, layer_id,
+      layer_name, security_type, capital_rate,
+      expect_earnings_rate, is_float, layer_result_level,
+      issue_period
+      )
+    values
+      <foreach collection="list" separator="," item="level">
+        (
+        #{level.id,jdbcType=INTEGER}, #{level.levelId,jdbcType=CHAR}, #{level.layerId,jdbcType=INTEGER},
+        #{level.layerName,jdbcType=VARCHAR}, #{level.securityType,jdbcType=TINYINT}, #{level.capitalRate,jdbcType=DECIMAL},
+        #{level.expectEarningsRate,jdbcType=DECIMAL}, #{level.isFloat,jdbcType=TINYINT}, #{level.layerResultLevel,jdbcType=VARCHAR},
+        #{level.issuePeriod,jdbcType=INTEGER}
+        )
+      </foreach>
+  </insert>
+</mapper>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.enterprise.EnterpriseReportModelMapper" >
+  <resultMap id="BaseResultMap" type="com.ccx.credit.risk.model.enterprise.EnterpriseReportModel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="report_type" property="reportType" jdbcType="INTEGER" />
+    <result column="report_son_type" property="reportSonType" jdbcType="INTEGER" />
+    <result column="financial_subject" property="financialSubject" jdbcType="VARCHAR" />
+    <result column="column_id" property="columnId" jdbcType="VARCHAR" />
+    <result column="column_excel" property="columnExcel" jdbcType="VARCHAR" />
+    <result column="required" property="required" jdbcType="TINYINT" />
+    <result column="report_son_no" property="reportSonNo" jdbcType="TINYINT" />
+    <result column="order_no" property="orderNo" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, report_type, report_son_type, financial_subject, column_id, column_excel, required, 
+    report_son_no, order_no
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from abs_enterprise_report_model
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--通过报表类型查询报表模板-->
+  <select id="selectByReportType" resultMap="BaseResultMap" parameterType="java.util.Map">
+    SELECT <include refid="Base_Column_List" />
+    FROM abs_enterprise_report_model
+    WHERE report_type = #{reportType,jdbcType=INTEGER}
+    AND report_son_type = #{reportSonType,jdbcType=INTEGER}
+  </select>
+
+  <!--WHERE report_type = #{reportType,jdbcType=INTEGER}
+    AND report_son_type = #{reportSonType,jdbcType=INTEGER}-->
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from abs_enterprise_report_model
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportModel" >
+    insert into abs_enterprise_report_model (id, report_type, report_son_type, 
+      financial_subject, column_id, column_excel, 
+      required, report_son_no, order_no
+      )
+    values (#{id,jdbcType=INTEGER}, #{reportType,jdbcType=INTEGER}, #{reportSonType,jdbcType=INTEGER}, 
+      #{financialSubject,jdbcType=VARCHAR}, #{columnId,jdbcType=VARCHAR}, #{columnExcel,jdbcType=VARCHAR}, 
+      #{required,jdbcType=TINYINT}, #{reportSonNo,jdbcType=TINYINT}, #{orderNo,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportModel" >
+    insert into abs_enterprise_report_model
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="reportType != null" >
+        report_type,
+      </if>
+      <if test="reportSonType != null" >
+        report_son_type,
+      </if>
+      <if test="financialSubject != null" >
+        financial_subject,
+      </if>
+      <if test="columnId != null" >
+        column_id,
+      </if>
+      <if test="columnExcel != null" >
+        column_excel,
+      </if>
+      <if test="required != null" >
+        required,
+      </if>
+      <if test="reportSonNo != null" >
+        report_son_no,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="reportType != null" >
+        #{reportType,jdbcType=INTEGER},
+      </if>
+      <if test="reportSonType != null" >
+        #{reportSonType,jdbcType=INTEGER},
+      </if>
+      <if test="financialSubject != null" >
+        #{financialSubject,jdbcType=VARCHAR},
+      </if>
+      <if test="columnId != null" >
+        #{columnId,jdbcType=VARCHAR},
+      </if>
+      <if test="columnExcel != null" >
+        #{columnExcel,jdbcType=VARCHAR},
+      </if>
+      <if test="required != null" >
+        #{required,jdbcType=TINYINT},
+      </if>
+      <if test="reportSonNo != null" >
+        #{reportSonNo,jdbcType=TINYINT},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportModel" >
+    update abs_enterprise_report_model
+    <set >
+      <if test="reportType != null" >
+        report_type = #{reportType,jdbcType=INTEGER},
+      </if>
+      <if test="reportSonType != null" >
+        report_son_type = #{reportSonType,jdbcType=INTEGER},
+      </if>
+      <if test="financialSubject != null" >
+        financial_subject = #{financialSubject,jdbcType=VARCHAR},
+      </if>
+      <if test="columnId != null" >
+        column_id = #{columnId,jdbcType=VARCHAR},
+      </if>
+      <if test="columnExcel != null" >
+        column_excel = #{columnExcel,jdbcType=VARCHAR},
+      </if>
+      <if test="required != null" >
+        required = #{required,jdbcType=TINYINT},
+      </if>
+      <if test="reportSonNo != null" >
+        report_son_no = #{reportSonNo,jdbcType=TINYINT},
+      </if>
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccx.credit.risk.model.enterprise.EnterpriseReportModel" >
+    update abs_enterprise_report_model
+    set report_type = #{reportType,jdbcType=INTEGER},
+      report_son_type = #{reportSonType,jdbcType=INTEGER},
+      financial_subject = #{financialSubject,jdbcType=VARCHAR},
+      column_id = #{columnId,jdbcType=VARCHAR},
+      column_excel = #{columnExcel,jdbcType=VARCHAR},
+      required = #{required,jdbcType=TINYINT},
+      report_son_no = #{reportSonNo,jdbcType=TINYINT},
+      order_no = #{orderNo,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

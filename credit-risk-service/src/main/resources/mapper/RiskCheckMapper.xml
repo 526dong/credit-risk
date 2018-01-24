@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ccx.credit.risk.mapper.riskcheck.RiskCheckMapper">
+     <!--所有主体（已提交，已评级，被退回）-->
+    <select id="allSubject" resultType="com.ccx.credit.risk.model.vo.riskcheck.RiskCheckVO">
+		SELECT a.id id, a.name NAME,c.rating_type TYPE, a.refuse_flag refuseFlag, DATE_FORMAT(a.create_date,'%Y-%m-%d') createDate, a.creator_name creator,
+			c.approval_status approvalStatus, c.id approvalId,act_task_id actTaskId,c.rating_apply_num ratingApplyNum,
+			DATE_FORMAT(c.approval_time,'%Y-%m-%d') approvalTime, c.approver approver,c.rating_result ratingResult,
+			c.pre_rating_result preRatingResult,c.edit_flag editFlag, c.rate_report rateReport
+		FROM abs_enterprise a, abs_enterprise_approval c
+		WHERE c.enterprise_id=a.id AND a.state=1 and (c.approval_status = 2 or c.approval_status = 3 or c.approval_status = 1)
+		and a.is_delete_flag = 0
+			<if test="null!=enterpriseId and ''!=enterpriseId" >
+				and a.id =#{enterpriseId}
+			</if>
+			<if test="null!=approvalStatus and ''!=approvalStatus" >
+				and c.approval_status =#{approvalStatus}
+			</if>
+			<if test="null!=type and ''!=type" >
+					and c.rating_type =#{type}
+			</if>
+			<if test="null!=ratingResult and ''!=ratingResult" >
+					and c.rating_result =#{ratingResult}
+			</if>
+			 <if test="null!=keyWord and ''!=keyWord" >
+				and (c.approver like concat('%',#{keyWord},'%') or a.name like concat('%',#{keyWord},'%') or a.creator_name like concat('%',#{keyWord},'%'))
+		   </if>
+		ORDER BY a.create_date DESC,c.initiate_time DESC
+	</select>
+	<!--history所有主体-->
+	<select id="historyAllSubject" resultType="com.ccx.credit.risk.model.vo.riskcheck.RiskCheckVO">
+		select a.id id, a.name name,DATE_FORMAT(c.initiate_time,'%Y-%m-%d') createDate,
+			c.id approvalId,act_task_id actTaskId, c.rating_apply_num ratingApplyNum,
+			c.initiator creator,c.approval_status approvalStatus,c.report_ids reportIds,
+			DATE_FORMAT(c.approval_time,'%Y-%m-%d') approvalTime,c.approver approver,c.rating_result ratingResult,
+			c.rating_type type, c.rate_report rateReport
+		from abs_enterprise a, abs_enterprise_approval c
+		where a.id=c.enterprise_id and a.state=1
+			and a.is_delete_flag = 0
+			and (c.approval_status = 2 or c.approval_status = 3 or c.approval_status = 4) and a.id =#{enterpriseId}
+			<if test="null!=approvalStatus and ''!=approvalStatus" >
+				and c.approval_status =#{approvalStatus}
+			</if>
+			<if test="null!=type and ''!=type" >
+				and c.rating_type =#{type}
+			</if>
+			<if test="null!=ratingResult and ''!=ratingResult" >
+				and c.rating_result =#{ratingResult}
+			</if>
+			<if test="null!=keyWord and ''!=keyWord" >
+				and (a.name like concat('%',#{keyWord},'%') or a.credit_code like concat('%',#{keyWord},'%')
+				or a.creator_name like concat('%',#{keyWord},'%'))
+			</if>
+		ORDER BY c.initiate_time DESC
+	</select>
+
+	<!--查询评级结果集合-->
+	<select id="findRateResult" resultType="map">
+		select id, name from rate_result
+	</select>
+
+	<!--查询评级调整理由-->
+	<select id="findRateReason" resultType="map">
+		select id, name from rate_reason
+	</select>
+</mapper>
